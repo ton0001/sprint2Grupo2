@@ -1,4 +1,6 @@
 require("dotenv").config();
+
+const { sequelize } = require('./database/models')
 const express = require("express");
 const app = express();
 const swaggerUi = require('swagger-ui-express')
@@ -13,6 +15,7 @@ const cartRoutes = require('./api/routes/cartsRoutes')
 const {login} = require("./api/controllers/usersController");
 
 const YAML = require('yamljs');
+const { Sequelize } = require("sequelize");
 const swaggerDocument = YAML.load('./swagger.yaml');
 
 
@@ -32,7 +35,8 @@ app.use('/api/v1/users', usersRoutes);
 
 
 app.listen(PORT, ()=> {
-    console.log(`server corriendo en ${PORT}`)
+    console.log(`server corriendo en ${PORT}`);
+    sequelize.sync({ alter: true });
 })
 
 

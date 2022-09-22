@@ -1,19 +1,19 @@
-const fs = require("fs");
-const path = require("path");
 const {generateJWT} = require('../../helpers/generateJWT');
 
-//recupero la lista de usuarios, respondo con un array conteniendo todos los usuarios del sistema
+const initModels = require("../../database/models/init-models");
+const { sequelize } = require('../../database/models');
 
-const getUsers = (req, res) => {
+const models = initModels(sequelize);
+
+//recupero la lista de usuarios, respondo con un array conteniendo todos los usuarios del sistema
+const getUsers = async (req, res) => {
   try {
-    let users = fs.readFileSync(
-      path.join(__dirname, "../data/users.json"),
-      "utf-8"
-    );
-    users = JSON.parse(users);
-    users.forEach(user => delete user.password)
+    const users = await models.users.findAll({
+      include: ['carts']
+    }) 
     res.send(users);
   } catch (error) {
+    console.log(error)
     res.status(500).send({ message: "Error al obtener los usuarios" });
     const usersArray = JSON.parse(users);
     res.send(usersArray);

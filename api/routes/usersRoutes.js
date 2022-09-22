@@ -15,7 +15,7 @@ const cartsController = require('../controllers/cartsController');
 const verifyJWT = require('../middlewares/verifyJWT');
 const isAuthenticated = require('../middlewares/verifyRoles');
 
-router.get("/", verifyJWT, isAuthenticated(['GOD', 'ADMIN']), getUsers);
+router.get("/", getUsers);
 router.get('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), cartsController.listCart);
 router.get("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), getUserById);
 router.post("/", createUser);
