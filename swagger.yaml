@@ -1,0 +1,860 @@
+openapi: 3.0.0
+info:
+  title: Mi ecommerce
+  version: 1.0.0
+  description: |-
+    Esta es la API de Mi ecommerce.
+    
+    Links:
+    - [Repositorio de Github](https://github.com/ton0001/grupo2sprint1/)
+  
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Entorno Desarrollo
+    
+tags:
+  - name: login
+    description: Todos los endpoints de login
+  - name: usuarios
+    description: Todos los endpoints de usuarios
+  - name: productos
+    description: Todos los endpoints de productos
+  - name: imagenes
+    description: Todos los endpoints de productos
+  - name: carritos
+    description: Todos los endpoints de productos
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  
+paths:
+  /login:
+    post:
+      tags: 
+        - login
+      summary: Recibe las credenciales de un user y las valida para generar un Token para dar autorización a las rutas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  email:
+                    type: string
+                  password: 
+                    type: string
+      responses:
+        '200':    # status code
+          description: Authorized
+          content:
+            application/json:
+              schema:  
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        username:
+                          type: string
+                    token:
+                      type: string
+        '400':    # status code
+          description: User NOT found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+        '500':    # status code
+          description: Error login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string 
+
+  /user/login:
+    post:
+      tags: 
+        - usuarios
+      summary: Recibe las credenciales de un user y las valida para generar un Token para dar autorización a las rutas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  email:
+                    type: string
+                  password: 
+                    type: string
+      responses:
+        '200':    # status code
+          description: Authorized
+          content:
+            application/json:
+              schema:  
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        username:
+                          type: string
+                    token:
+                      type: string
+        '400':    # status code
+          description: User NOT found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+        '500':    # status code
+          description: Error login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string 
+              
+          
+  /users:
+    get:
+      tags: 
+        - usuarios
+      summary: Retorna listado de usuario.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':    # status code
+          description: Un array de usuarios
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    email:
+                      type: string
+                    username:
+                      type: string
+                    firstname:
+                      type: string
+                    lastname:
+                      type: string
+                    profilepic:
+                      type: string
+                    role:
+                      type: string   
+        '500':    # status code
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Usuario no autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        
+    post:
+      tags: 
+        - usuarios
+      summary: Crear un usuario. Debe recibir un body con la info del user a crear.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  email:
+                    type: string
+                  username:
+                    type: string
+                  password: 
+                    type: string
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  profilepic:
+                    type: string
+                  role:
+                    type: string
+      responses: 
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  username:
+                    type: string
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  profilepic:
+                    type: string
+                  role:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /users/{id}:
+    get:
+      tags: 
+        - usuarios
+      summary: Recupera el user con el id solicitado.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Filtrar usuario por id.
+          required: true
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':    # status code
+          description: Un array de usuarios
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  id:
+                    type: number
+                  email:
+                    type: string
+                  username:
+                    type: string
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  profilepic:
+                    type: string
+                  role:
+                    type: string
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Error al obtener el usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      tags: 
+        - usuarios
+      summary: Actualiza el user identificado con id. Debe recibir un body con la info del user a modificar.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Filtrar usuario por id.
+          required: true
+          explode: true
+          schema:
+            type: number
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  email:
+                    type: string
+                  username:
+                    type: string
+                  password: 
+                    type: string
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  profilepic:
+                    type: string
+                  role:
+                    type: string
+      responses:
+        '200':    # status code
+          description: Un array de usuarios
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  id:
+                    type: number
+                  email:
+                    type: string
+                  username:
+                    type: string
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  profilepic:
+                    type: string
+                  role:
+                    type: string
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Error al obtener el usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      tags: 
+        - usuarios
+      summary: Elimina un usuario con id.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Eliminar el user identificado con id. 
+          required: true
+          explode: true
+          schema:
+            type: number
+      responses: 
+        '200':
+          description: Usuario {id} eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Error al eliminar el usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    
+  /products:
+    get:
+      tags: 
+        - productos
+      summary: Retorna un listado de todos los productos.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':    # status code
+          description: Un array de todos los productos.
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: string
+                    price:
+                      type: number
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    gallery:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          picture_id:
+                            type: number
+                          picture_url:
+                            type: string
+                    category:
+                      type: string
+                    mostwanted:
+                      type: boolean
+                    stock:
+                      type: number
+        '500':    # status code
+          description: Error del servidor al cargar los productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    post:
+      tags: 
+        - productos
+      summary: Crea un nuevo producto. Debe recibir un body con la info del producto a crear
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  title:
+                    type: string
+                  price:
+                    type: number
+                  description:
+                    type: string
+                  image:
+                    type: string
+                  gallery:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        picture_id:
+                          type: number
+                        picture_url:
+                          type: string
+                  category:
+                    type: string
+                  mostwanted:
+                    type: boolean
+                    default: false
+                  stock:
+                    type: number
+                    default: 0
+      responses:
+        '200':    # status code
+          description: Producto creado.
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: string
+                    price:
+                      type: number
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    gallery:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          picture_id:
+                            type: number
+                          picture_url:
+                            type: string
+                    category:
+                      type: string
+                    mostwanted:
+                      type: boolean
+                    stock:
+                      type: number
+        '400':    # status code
+          description: Faltan datos para crear el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':    # status code
+          description: Error del servidor al crear el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /products/{id}:
+    get:
+      tags: 
+        - productos
+      summary: Recupera el product con el id solicitado. 
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Filtra el producto por el id otorgado. 
+        required: true
+        explode: true
+        schema:
+          type: number
+      responses:
+        '200':    # status code
+          description: Retorna el producto.
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: string
+                    price:
+                      type: number
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    gallery:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          picture_id:
+                            type: number
+                          picture_url:
+                            type: string
+                    category:
+                      type: string
+                    mostwanted:
+                      type: boolean
+                    stock:
+                      type: number
+        '404':    # status code
+          description: El producto no existe.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+        '500':    # status code
+          description: Error del servidor al cargar el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+    put:
+      tags: 
+        - productos
+      summary: Actualiza el product identificado con id. Debe recibir un body con la info del producto a modificar.
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Filtra el producto por el id otorgado. 
+        required: true
+        explode: true
+        schema:
+          type: number
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  title:
+                    type: string
+                  price:
+                    type: number
+                  description:
+                    type: string
+                  image:
+                    type: string
+                  gallery:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        picture_id:
+                          type: number
+                        picture_url:
+                          type: string
+                  category:
+                    type: string
+                  mostwanted:
+                    type: boolean
+                    default: false
+                  stock:
+                    type: number
+                    default: 0
+      responses:
+        '200':    # status code
+          description: Retorna el producto modificado.
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: string
+                    price:
+                      type: number
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    gallery:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          picture_id:
+                            type: number
+                          picture_url:
+                            type: string
+                    category:
+                      type: string
+                    mostwanted:
+                      type: boolean
+                    stock:
+                      type: number
+        '404':    # status code
+          description: El producto no existe.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+        '500':    # status code
+          description: Error del servidor al modificar el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+    delete:
+      tags: 
+        - productos
+      summary: Elimina el product identificado con id. 
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Filtra el producto por el id otorgado. 
+        required: true
+        explode: true
+        schema:
+          type: number
+      responses:
+        '200':    # status code
+          description: producto eliminado con exito
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+        '400':    # status code
+          description: Llamada incorrecta.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+        '404':    # status code
+          description: El producto no existe.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+        '500':    # status code
+          description: Error del servidor al eliminar el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+    
+    
+
+
+  # /demo:
+  #   get:
+  #     tags: 
+  #       - usuarios
+  #     summary: Retorna listado de usuario.
+  #     security:
+  #       - bearerAuth: []
+  #     responses:
+  #       '200':    # status code
+  #         description: Un array de usuarios
+  #       '401':    # status code
+  #         description: Usuario no autorizado 
+  #   delete:
+  #     tags: 
+  #       - usuarios
+  #     summary: Elimina un usuario
+  #     parameters:
+  #       - in: path
+  #         name: username
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Nombre de usuario
+      
+  #     responses: 
+  #       '200':
+  #         description: El usuario ha sido eliminado
+  #       '409':
+  #         description: El usuario no ha sido eliminado 
