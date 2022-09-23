@@ -1,65 +1,79 @@
-const fs = require("fs");
-const path = require("path");
+const initModels = require("../../database/models/init-models");
+const { sequelize } = require('../../database/models');
+
+const models = initModels(sequelize);
+
 
 /* Authentication middleware (roles = array roles autorizados)
     roles: [ 'GUESTID, 'GUEST', 'ADMINID', 'ADMIN', 'GOD  ]
 */
-const isAuthenticated = (roles) => (req, res, next) => {
+const isAuthenticated = (roles) => async (req, res, next) => {
     
-    getRole(req, res)
+     const result = await getRole(req, res)
 
-    switch (req.role){
+    if (result.ok){
+        switch (req.role){
 
-        case "GOD":
-            next();
-        break
-
-        case "ADMIN":
-            if (roles.indexOf('ADMIN') !== -1) next()
-            else if (roles.indexOf("ADMINID") !== -1){
-                if (verifyUser(req)) next()
+            case "GOD":
+                next();
+            break
+    
+            case "ADMIN":
+                if (roles.indexOf('ADMIN') !== -1) next()
+                else if (roles.indexOf("ADMINID") !== -1){
+                    if (verifyUser(req)) next()
+                    else{
+                        return res.status(403).json({
+                            ok: false,
+                            msg: "Unauthorized ID does not match with logged ID (Admin)",
+                        });
+                    }
+                }
                 else{
-                    return res.status(403).json({
+                    return res.status(401).json({
                         ok: false,
-                        msg: "Unauthorized ID does not match with logged ID",
+                        msg: "Unauthorized como (Admin)",
                     });
                 }
-            }
-            else{
+            break
+    
+            case "GUEST":
+                if (roles.indexOf('GUEST') !== -1) next()
+                else if (roles.indexOf("GUESTID") !== -1){
+                    if (verifyUser(req)) next()
+                    else{
+                        return res.status(403).json({
+                            ok: false,
+                            msg: "Unauthorized ID does not match with logged ID (Guest)",
+                        });
+                    }
+                }
+                else{
+                    return res.status(401).json({
+                        ok: false,
+                        msg: "Unauthorized (Guest)",
+                        });
+                }
+            break;
+                    
+            default:
                 return res.status(401).json({
                     ok: false,
-                    msg: "Unauthorized",
+                    msg: "Unauthorized bad request",
+                });
+            break
+            }
+        }
+        else{
+            return res.status(result.status).json({
+               ok: false,
+               msg: result.message,
                 });
             }
-        break
 
-        case "GUEST":
-            if (roles.indexOf('GUEST') !== -1) next()
-            else if (roles.indexOf("GUESTID") !== -1){
-                if (verifyUser(req)) next()
-                else{
-                    return res.status(403).json({
-                        ok: false,
-                        msg: "Unauthorized ID does not match with logged ID",
-                    });
-                }
-            }
-            else{
-                return res.status(401).json({
-                    ok: false,
-                    msg: "Unauthorized",
-                    });
-            }
-        break;
-                
-        default:
-            return res.status(401).json({
-                ok: false,
-                msg: "Unauthorized",
-            });
-        break
     }
-}
+
+
 
 
 const verifyUser = (req)=>{
@@ -67,36 +81,37 @@ const verifyUser = (req)=>{
     else return false
 }
 
-const getRole = (req, res) => {
+const getRole = async (req, res) => {
+    let result
     try {
-        const ruta=path.join(__dirname, '..', 'data', 'users.json')
-        const dbUsers = fs.readFileSync(ruta, "utf-8");
-        const users = JSON.parse(dbUsers);
         
         const idToken = req.tokenID
+        const user_exist = await models.users.findByPk(idToken) 
 
-        const user = users.find((user) => {
-            return user.id === Number(idToken);
-        });
-
-        if (user) {
-            req.id = user.id;
-            req.role = user.role;
-            return
-            // next();
-        } else {
-            return res.status(403).json({
-            ok: false,
-            msg: "Usuario ID no encontrado",
-            });
-    }
+          if (!user_exist){
+            result = {
+                    status: 400,
+                    ok : false,
+                    message: "Usuario ID no encontrado"
+                }
+          }
+          
+          req.role = user_exist.role;
+          result= {
+                status: 200,
+                ok : true,
+                message: "Role cargado correctamente a req"
+          }
     }catch (err) {
-        console.log(err);
-        return res.status(500).json({
-        ok: false,
-        msg: "Error de servidor",
-        });
+        console.log(err)
+        result = {
+            status: 500,
+            ok : false,
+            message: "Error de servidor"
+        }
+
     }
+    return result
 };
 
 module.exports = isAuthenticated;

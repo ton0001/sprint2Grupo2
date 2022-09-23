@@ -1,9 +1,12 @@
 const jwt =  require('jsonwebtoken')
 
+const extractToken = require('../../helpers/extractToken')
+
+
+
 const verifyJWT = (req, res, next) =>{
 
     const token = extractToken(req)
-    // const {authorization: token} = req.headers
     try {
 
         req.tokenID= jwt.verify(token, process.env.JWT_PRIVATE).id
@@ -18,12 +21,5 @@ const verifyJWT = (req, res, next) =>{
     }
 }
 
-const extractToken = (req)=>{
-
-    if(req.headers.authorization && req.headers.authorization.split(' ')[0] === "Bearer"){
-        return req.headers.authorization.split(' ')[1]
-    }
-    return null
-}
 
 module.exports = verifyJWT  

@@ -52,43 +52,26 @@ const getUserById = (req, res) => {
 
 //Creo un nuevo Usuario. Debe recibir un body con la informacion del usuario a crear. Responde con la indormacion completa del usuario creado
 
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
 
-  if(!estanLosDatos(req.body)){
-      res.status(401).json({ message: "Faltan datos para crear el usuario"})
-  }
-  else{
+  //si llegue hasta aca tengo todos los campos necesarios y validos.
 
+  try{
+    await models.users.create(req.body)
 
-  try {
+    res.status(200).json({ 
+        ok: true,
+        message: "Usuario creado correctamente" 
+      });
+  }catch(error){
+      // console.log(error)
+      res.status(500).json({ 
+        ok: true,
+        message: "Hubo un error al crear el usuario1"
+      });
     
-    let users = fs.readFileSync(
-      path.join(__dirname, "../data/users.json"),
-      "utf-8"
-    );
-    users = JSON.parse(users);
-    const newUser = {
-      id: users.length + 1,
-      email: req.body.email,
-      username: req.body.username,
-      password: req.body.password,
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      profilepic: req.body.profilepic,
-      role: req.body.role,
-    };
-    users.push(newUser);
-    fs.writeFileSync(
-      path.join(__dirname, "../data/users.json"),
-      JSON.stringify(users)
-    );
-    res.send(newUser);
-  } catch (error) {
-    res.status(500).json({ message: "Error al crear el usuario" });
   }
 }
-
-};
 
 /*Actualiza un usuario identificado con id. 
 Debe recibir un body con la informacion del usuario a actualizar. 
@@ -171,35 +154,31 @@ const deleteUser = (req, res) => {
 
 const login = async (req, res)=>{
 
-  const {email, password} = req.body;
+  const {username, password} = req.body;
 
   try {
-      const ruta=path.join(__dirname, '..', 'data', 'users.json')
-      const dbUsers=fs.readFileSync(ruta, 'utf-8')
-      const users=JSON.parse(dbUsers)
+      const user_exist = await models.users.findOne({
+        where: [{username: username}, {password: password}],
+      }) 
+      // console.log(user_exist);
 
-
-      const user = users.find(user => {
-          return (user.email === email && user.password === password); 
-          })
-
-      if(!user){
-          return res.status(400).json({
-              ok: false,
-              mgs: "User NOT found"
-          })
+      if (!user_exist){
+        return res.status(400).json({
+          ok: false,
+          mgs: "Wrong password or username"
+        })
       }
 
       const userLog = {
-          id: user.id,
-          username: user.name
+          id: user_exist.id,
+          username: user_exist.name
        }
 
       const token = await generateJWT(userLog)
 
       res.status(200).json({
           "success": true,
-          "message": "Authorized",
+          "message": "Authorized Login Success",
           "user": userLog,
           token,
       })
@@ -209,7 +188,7 @@ const login = async (req, res)=>{
       console.log(error)
       res.status(500).json({
           ok:false,
-          mgs: "Error login"
+          mgs: "Error in login"
       })
 
   }
