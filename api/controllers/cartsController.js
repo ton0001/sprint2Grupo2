@@ -1,19 +1,36 @@
+const initModels = require("../../database/models/init-models");
+const { sequelize } = require('../../database/models');
+
+const models = initModels(sequelize);
 
 const controllerCart = {
-  listCart: (req, res) => {
-    const id = req.params.id;
-
+  listCart: async (req, res) => {
     try {
-      const cartDBJson = fs.readFileSync("api/data/carts.json", "utf-8");
-      const cartDB = JSON.parse(cartDBJson);
+      const cartDBJson = await models.carts.findAll(
+        {
+          include: [
+            {
+              model: models.users,
+              as: 'users'
+            },
+            {
+            model: models.product_cart,
+            as: 'product_carts',
+            attributes: ['product_id', 'quantity', 'created_at', 'updated_at'],
+        }
+        
+      ],
+        where: {id: req.params.id}
+        }
+      )
 
-      const cart = cartDB.find(el => el.user === Number(id));
-      if (!cart){
-        return res.status(400).json({
-          msg: 'Bad request'
-        });
-      }
-      res.status(200).send(cart.cart)
+      // const cart = cartDB.find(el => el.user === Number(id));
+      // if (!cart){
+      //   return res.status(400).json({
+      //     msg: 'Bad request'
+      //   });
+      // }
+      res.status(200).send(cartDBJson)
     } catch (error) {
         console.log(error);
         res.status(500).json({

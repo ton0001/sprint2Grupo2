@@ -9,7 +9,16 @@ const models = initModels(sequelize);
 const getUsers = async (req, res) => {
   try {
     const users = await models.users.findAll({
-      include: ['carts']
+      include: [{
+        model: models.carts,
+        as: 'carts',
+        attributes: {exclude: ['user_id']},
+        include: [{
+          model: models.product_cart,
+          as: 'product_carts',
+          attributes: ['product_id', 'quantity', 'created_at', 'updated_at'],
+      }]
+      }]
     }) 
     res.send(users);
   } catch (error) {
