@@ -23,7 +23,7 @@ function initModels(sequelize) {
   pictures.belongsTo(products, { as: "product", foreignKey: "product_id"});
   products.hasMany(pictures, { as: "pictures", foreignKey: "product_id"});
   product_cart.belongsTo(products, { as: "product", foreignKey: "product_id"});
-  products.hasMany(product_cart, { as: "product_carts", foreignKey: "product_id"});
+  products.hasMany(product_cart, { as: "cart", foreignKey: "product_id"});
 
   return {
     carts,

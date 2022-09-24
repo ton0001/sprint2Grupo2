@@ -6,31 +6,32 @@ const models = initModels(sequelize);
 const controllerCart = {
   listCart: async (req, res) => {
     try {
-      const cartDBJson = await models.carts.findAll(
+      const cartDB = await models.carts.findOne(
         {
+          where: {user_id: req.params.id},
           include: [
             {
-            model: models.product_cart,
-            as: 'cart_products',
-            attributes: ['product_id', 'quantity', 'created_at', 'updated_at'],
-        }
-        
-      ],
-        where: {id: req.params.id}
+              model: models.product_cart,
+              as: 'cart_products',
+              attributes: ['product_id', 'quantity', 'created_at', 'updated_at']
+            }
+          ]
         }
       )
 
-      // const cart = cartDB.find(el => el.user === Number(id));
-      // if (!cart){
-      //   return res.status(400).json({
-      //     msg: 'Bad request'
-      //   });
-      // }
-      res.status(200).send(cartDBJson)
+      if (!cartDB){
+        return res.status(400).json({
+          ok: false,
+          message: 'El id solicitado no existe'
+        });
+      }
+
+      res.status(200).json(cartDB)
     } catch (error) {
         console.log(error);
         res.status(500).json({
-           msg: 'Error interno'
+          ok: false,
+          message: 'Error interno del servidor'
         });
     }
   },
