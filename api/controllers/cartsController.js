@@ -10,12 +10,8 @@ const controllerCart = {
         {
           include: [
             {
-              model: models.users,
-              as: 'users'
-            },
-            {
             model: models.product_cart,
-            as: 'product_carts',
+            as: 'cart_products',
             attributes: ['product_id', 'quantity', 'created_at', 'updated_at'],
         }
         
