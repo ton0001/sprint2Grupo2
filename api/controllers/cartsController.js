@@ -6,68 +6,55 @@ const models = initModels(sequelize);
 const controllerCart = {
   listCart: async (req, res) => {
     try {
-      const cartDBJson = await models.carts.findAll(
+      const cartDBJson = await models.carts.findByPk( req.params.id,
         {
           include: [
             {
-              model: models.users,
-              as: 'users'
-            },
-            {
             model: models.product_cart,
-            as: 'product_carts',
+            as: 'cart_products',
             attributes: ['product_id', 'quantity', 'created_at', 'updated_at'],
-        }
-        
-      ],
-        where: {id: req.params.id}
+            }  
+          ]
         }
       )
 
-      // const cart = cartDB.find(el => el.user === Number(id));
-      // if (!cart){
-      //   return res.status(400).json({
-      //     msg: 'Bad request'
-      //   });
-      // }
-      res.status(200).send(cartDBJson)
+      if (!cartDBJson){
+        return res.status(400).json({
+          ok: false,
+          message: 'Bad request'
+        });
+      }
+
+      res.status(200).json(cartDBJson)
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
-           msg: 'Error interno'
+          ok: false,
+          message: 'Error interno'
         });
     }
   },
-  updateCart: (req, res) => {
-    const id = req.params.id;
+  updateCart: async (req, res) => {
     const dataUpdate = req.body;
 
     try {
-      const cartDBJson = fs.readFileSync("api/data/carts.json", "utf-8");
-      let cartDB = JSON.parse(cartDBJson);
+      const cartDBJson = await models.product_cart.update( dataUpdate, {
+        where: {id: req.params.id}
+      } )
 
-      let cart = cartDB.find(el => el.user === Number(id));
-      if (cart){
-        cartDB.forEach(el => {
-            if(el.user === Number(id)){
-                el.cart = dataUpdate;
-            }
-        });
-
-        cart = cartDB.find(el => el.user === Number(id))
-
-        fs.writeFileSync("api/data/carts.json", JSON.stringify(cartDB));
-
-        res.status(200).send(cart.cart)
+      if (cartDBJson){
+        res.status(200).json(cartDBJson)
       } else {
         res.status(404).json({
-            msg: 'Not Found'
+            ok: false,
+            message: 'Not Found'
         })
       }
     } catch (error) {
         console.log(error);
         res.status(500).json({
-           msg: 'Error interno'
+           message: 'Error interno'
         });
     }
   }

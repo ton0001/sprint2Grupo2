@@ -11,11 +11,11 @@ const getUsers = async (req, res) => {
     const users = await models.users.findAll({
       include: [{
         model: models.carts,
-        as: 'carts',
+        as: 'cart',
         attributes: {exclude: ['user_id']},
         include: [{
           model: models.product_cart,
-          as: 'product_carts',
+          as: 'cart_products',
           attributes: ['product_id', 'quantity', 'created_at', 'updated_at'],
       }]
       }]
