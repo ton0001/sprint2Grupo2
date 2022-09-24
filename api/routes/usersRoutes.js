@@ -6,31 +6,37 @@ const {
   createUser,
   updateUser,
   deleteUser,
-  login
+  login,
 } = require("../controllers/usersController");
 
+const cartsController = require("../controllers/cartsController");
 
-const cartsController = require('../controllers/cartsController');
-
-const verifyJWT = require('../middlewares/verifyJWT');
-const isAuthenticated = require('../middlewares/verifyRoles');
+const verifyJWT = require("../middlewares/verifyJWT");
+const isAuthenticated = require("../middlewares/verifyRoles");
 
 router.get("/", getUsers);
-router.get('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), cartsController.listCart);
-router.get("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), getUserById);
+router.get(
+  "/:id/cart",
+  verifyJWT,
+  isAuthenticated(["GOD", "ADMIN", "GUESTID"]),
+  cartsController.listCart
+);
+router.get("/:id", getUserById);
 router.post("/", createUser);
-router.put('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
-router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), updateUser);
-router.delete("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), deleteUser);
+router.put(
+  "/:id/cart",
+  verifyJWT,
+  isAuthenticated(["GOD", "ADMINID", "GUESTID"]),
+  cartsController.updateCart
+);
+router.put("/:id", updateUser);
+router.delete(
+  "/:id",
+  verifyJWT,
+  isAuthenticated(["GOD", "ADMINID", "GUESTID"]),
+  deleteUser
+);
 
-router.post('/login', login);
-
-
-
-
-
+router.post("/login", login);
 
 module.exports = router;
-
-
-
