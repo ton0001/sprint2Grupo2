@@ -7,7 +7,7 @@ const models = initModels(sequelize);
 const getPictureByProductId = async (req, res) => {
   try {
     const resp = await models.pictures.findAll({
-        where: {id: req.query.id}
+        where: {product_id: req.query.product}
     })
 
     if(resp.length > 0){
@@ -36,7 +36,8 @@ const getPictureById = async(req, res) => {
 
     const bodyId = req.params.id;
 
-    const resp = models.pictures.findByPk(bodyId);
+    const resp = await models.pictures.findByPk(bodyId);
+    
 
     if (resp == null) {
       res.status(404).json({
