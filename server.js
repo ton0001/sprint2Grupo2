@@ -31,11 +31,13 @@ app.use('/api/v2/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.get('/api/v2',  (req, res)=>{ res.status(200).send("API funcionando correctamente")})
 
 
+
 app.post('/api/v2/login',
-      check('username', 'el username es requerido').not().isEmpty(),
-      check('password', 'la contraseña es requerida').not().isEmpty(),
-      handleErrors,
-      login);
+    check('username', 'el username es requerido').not().isEmpty(),
+    check('password', 'la contraseña es requerida').not().isEmpty(),
+    handleErrors,
+    login);
+
 
 app.use('/api/v2/products',productRoutes)
 app.use('/api/v2/pictures',pictureRoutes)

@@ -1461,7 +1461,7 @@ paths:
                     description:
                       type: string
                       example: Imagen de comida
-                    productId:
+                    product_id:
                       type: number
                       example: 2
         '401':
@@ -1506,7 +1506,7 @@ paths:
 
 
   
-  /picture:
+  /pictures:
     post:
       tags: 
         - imagenes
@@ -1526,7 +1526,7 @@ paths:
                   description:
                     type: string
                     example: Imagen de comida
-                  productId:
+                  product_id:
                     type: number
                     example: 12
       responses:
@@ -1546,7 +1546,7 @@ paths:
                   description:
                     type: string
                     example: Imagen de comida
-                  productId:
+                  product_id:
                     type: number
                     example: 12
         '401':
@@ -1596,7 +1596,7 @@ paths:
         - bearerAuth: []
       parameters: 
         - in : query
-          name: products
+          name: product
           schema:
             type: number
           required: true
@@ -1622,7 +1622,7 @@ paths:
                     description:
                       type: string
                       example: Imagen de comida
-                    productId:
+                    product_id:
                       type: number
                       example: 65
         '404':    # status code
@@ -1665,7 +1665,7 @@ paths:
                     type: string  
                     example: Error de servidor
   
-  /picture/{id}:
+  /pictures/{id}:
     get:
       tags: 
         - imagenes
@@ -1697,7 +1697,7 @@ paths:
                   description:
                     type: string
                     example: Imagen de comida
-                  productId:
+                  product_id:
                     type: number
                     example: 2
         '404':    # status code
@@ -1767,7 +1767,7 @@ paths:
                   description:
                     type: string
                     example: Imagen de comida
-                  productId:
+                  product_id:
                     type: number
                     example: 2
       responses:
@@ -1787,7 +1787,7 @@ paths:
                   description:
                     type: string
                     example: Imagen de comida
-                  productId:
+                  product_id:
                     type: number
                     example: 2
         '404':    # status code
