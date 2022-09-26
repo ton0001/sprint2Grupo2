@@ -22,7 +22,7 @@ const controllerCart = {
       if (!cartDB){
         return res.status(400).json({
           ok: false,
-          message: 'El id solicitado no existe'
+          message: 'El id del usuario solicitado no existe'
         });
       }
 
@@ -38,13 +38,31 @@ const controllerCart = {
   updateCart: async (req, res) => {
     const dataUpdate = req.body;
 
+    req.body.forEach(product => {
+      try{
+        let productDB = models.products.findByPk(product.product_id);
+
+        if(productDB.stock < product.quantity) {
+          res.status(400).json({
+            ok: false,
+            message: 'No hay stock suficiente'
+          })
+        }
+      } catch(err) {
+        return res.status(500).json({
+          ok:false,
+          message: 'Error interno'
+        });
+      }
+    })
+
     try {
-      const cartDBJson = await models.product_cart.update( dataUpdate, {
+      const cartDB = await models.product_cart.update( req.body, {
         where: {id: req.params.id}
       } )
 
-      if (cartDBJson){
-        res.status(200).json(cartDBJson)
+      if (cartDB){
+        res.status(200).json(cartDB)
       } else {
         res.status(404).json({
             ok: false,
@@ -53,10 +71,30 @@ const controllerCart = {
       }
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
+          ok:false,
            message: 'Error interno'
         });
     }
+
+    req.body.forEach(product => {
+      try{
+        let productDB = models.products.findByPk(product.product_id);
+
+        if(productDB.stock >= product.quantity) {
+          models.products.update(product.quantity, {
+            where: {
+              id: product.product_id
+            }
+          })
+        }
+      } catch(err) {
+        res.status(500).json({
+          ok:false,
+          message: 'Error interno'
+        });
+      }
+    })
   }
 };
 
