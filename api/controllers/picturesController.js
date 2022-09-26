@@ -31,12 +31,14 @@ const getPictureByProductId = async (req, res) => {
 };
 
 //funcion que devuelve una imagen por el id de la misma
-const getPictureById = (req, res) => {
+const getPictureById = async(req, res) => {
   try {
 
-    const resp = pictures.find((elem) => elem.id === parseInt(req.params.id));
+    const bodyId = req.params.id;
 
-    if (!resp) {
+    const resp = models.pictures.findByPk(bodyId);
+
+    if (resp == null) {
       res.status(404).json({
         ok: false,
         msg: "no existe imagen con tal id",
@@ -162,14 +164,6 @@ const deletePicture = async (req, res) => {
         where: {id: req.params.id}
     })
 
-    /*
-    if (!imagenEncontrada) {
-      res.status(404).json({
-        ok: false,
-        msg: "no existe imagen con tal id",
-      });
-    } 
-    */
     res.status(200).json({
        ok: true,
        msg: "imagen eliminada con exito",
