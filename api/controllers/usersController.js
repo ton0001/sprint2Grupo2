@@ -54,24 +54,41 @@ const getUserById = (req, res) => {
 
 const createUser = async (req, res) => {
 
-  //si llegue hasta aca tengo todos los campos necesarios y validos.
-
   try{
-    await models.users.create(req.body)
-
-    res.status(200).json({ 
-        ok: true,
-        message: "Usuario creado correctamente" 
-      });
+     await models.users.create(req.body)
+    // console.log(user)
   }catch(error){
       // console.log(error)
-      res.status(500).json({ 
+      return res.status(500).json({ 
         ok: true,
         message: "Hubo un error al crear el usuario1"
       });
     
   }
+
+  try{
+    
+    await models.carts.create({
+      user_id : user.id,
+      
+    })
+
+    res.status(200).json({ 
+      ok: true,
+      message: "Usuario creado correctamente" 
+    });
+
+  }catch(error){{
+    return res.status(500).json({ 
+      ok: true,
+      message: "Hubo un error al crear el usuario1"
+    });
+  }
+
+  }
+
 }
+
 
 /*Actualiza un usuario identificado con id. 
 Debe recibir un body con la informacion del usuario a actualizar. 
