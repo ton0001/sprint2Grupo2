@@ -4,19 +4,22 @@ const {getPictureById, updatePic, createPic, deletePicture, getPictureByProductI
 const verifyJWT = require('../middlewares/verifyJWT');
 const isAuthenticated = require('../middlewares/verifyRoles');
 
-router.get('/:id', verifyJWT, getPictureById);
-router.get('/', verifyJWT, getPictureByProductId)
 
-router.post('/', verifyJWT, isAuthenticated(['GOD']), createPic);
+// <<<- RUTAS FINALES ->>>
+
+//router.get('/:id', verifyJWT, getPictureById);
+//router.get('/', verifyJWT, getPictureByProductId)
+//router.post('/', verifyJWT, isAuthenticated(['GOD']), createPic);
+//router.put('/:id', verifyJWT, isAuthenticated(['GOD', 'ADMIN']), updatePic);
+//router.delete('/:id', verifyJWT, isAuthenticated(['GOD']), deletePicture);
+
 
 // <<< --- RUTAS DE PRUEBA SIN LOGIN --- >>>
-//router.post('/', createPic);
+router.get('/', getPictureByProductId)
+router.get('/:id', getPictureById);
+router.post('/', createPic);
+router.put('/:id', updatePic);
 router.delete('/:id', deletePicture)
-
 // <<<<<<< - - - - - - >>>>>>>>>
-
-router.put('/:id', verifyJWT, isAuthenticated(['GOD', 'ADMIN']), updatePic);
-
-//router.delete('/:id', verifyJWT, isAuthenticated(['GOD']), deletePicture);
 
 module.exports = router;

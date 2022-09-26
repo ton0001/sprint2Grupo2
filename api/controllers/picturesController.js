@@ -3,26 +3,23 @@ const initModels = require("../../database/models/init-models");
 const { sequelize } = require('../../database/models');
 const models = initModels(sequelize);
 
-const getPictureByProductId = (req, res) => {
+// busca en la tabla de pictures el id de producto que se desee buscar
+const getPictureByProductId = async (req, res) => {
   try {
-    const ruta = path.join(__dirname, "..", "data", "gallery.json");
-    let pictures = fs.readFileSync(ruta, "utf-8");
-    pictures = JSON.parse(pictures);
+    const resp = await models.pictures.findAll({
+        where: {id: req.query.id}
+    })
 
-    const resp = pictures.filter(
-      (elem) => elem.productId === parseInt(req.query.product)
-    );
-
-    if (resp.length > 0) {
-      res.status(200).json({
-        ok: true,
-        resp,
-      });
-    } else {
-      res.status(404).json({
-        ok: false,
-        msg: "no existen coincidencias",
-      });
+    if(resp.length > 0){
+        res.status(200).json({
+            ok: true,
+            resp
+        });
+    }else{
+        res.status(404).json({
+            ok: false,
+            msg: 'no data found'
+        });
     }
   } catch (error) {
     console.log(error);
@@ -36,10 +33,6 @@ const getPictureByProductId = (req, res) => {
 //funcion que devuelve una imagen por el id de la misma
 const getPictureById = (req, res) => {
   try {
-    const ruta = path.join(__dirname, "..", "data", "gallery.json");
-    console.log(ruta);
-    let pictures = fs.readFileSync(ruta, "utf-8");
-    pictures = JSON.parse(pictures);
 
     const resp = pictures.find((elem) => elem.id === parseInt(req.params.id));
 
@@ -104,53 +97,61 @@ const createPic = async (req, res) => {
 };
 
 //funcion que actualiza los datos de una picture
-const updatePic = (req, res) => {
-  try {
-    const ruta = path.join(__dirname, "..", "data", "gallery.json");
-    let pictures = fs.readFileSync(ruta, "utf-8");
-    pictures = JSON.parse(pictures);
+const updatePic = async (req, res) => {
+    try {
+        // trae los datos necesarios desde el body
+        const bodyUrl = req.body.url;
+        const bodyDescription = req.body.description;
+        const bodyProductId = req.body.product_id;
 
-    const id = req.params.id;
-    const url = req.body.url;
-    const description = req.body.description;
-    const productId = req.body.productId;
-
-    if (!url && !description && !productId) {
-      res.status(400).json({
-        ok: false,
-        msg: "debe indicar el dato a editar",
-      });
-    } else {
-      //const editar = pictures.find(elem => elem.id === parseInt(req.body.id));
-      let encontro = false;
-      for (let i = 0; i < pictures.length && !encontro; i++) {
-        if (pictures[i].id === parseInt(id)) {
-          if (url) {
-            pictures[i].url = url;
-          }
-          if (description) {
-            pictures[i].description = description;
-          }
-          if (productId) {
-            pictures[i].productId = productId;
-          }
-          encontro = true;
+    
+        //si no llegan los datos requeridos lanza una respuesta de error
+        if(!bodyUrl && !bodyProductId && !bodyUrl){
+            return res.status(400).json({
+                ok: false,
+                msg: 'faltan campos requeridos'
+            })
         }
+    
+        if(bodyUrl){
+            await models.pictures.update({
+                url : bodyUrl,
+                
+            },
+            {
+                where: {id: req.params.id}
+            });
+        }
+        
+        if(bodyDescription){
+            await models.pictures.update({
+                description : bodyDescription,
+            },
+            {
+                where: {id: req.params.id}
+            });
+        }
+        if(bodyProductId){
+            await models.pictures.update({
+                product_id : bodyProductId,
+            },
+            {
+                where: {id: req.params.id}
+            });
+        }
+    
+        res.status(200).json({
+          ok: true,
+          msg: "imagen actualizada con exito",
+        });
+    
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({
+          ok: false,
+          msg: "server error",
+        });
       }
-
-      fs.writeFileSync(ruta, JSON.stringify(pictures));
-
-      res.status(200).json({
-        ok: true,
-        msg: "imagen editada",
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      msg: "server error",
-    });
-  }
 };
 
 //funcion para eliminar una picture
@@ -169,10 +170,10 @@ const deletePicture = async (req, res) => {
       });
     } 
     */
-      res.status(200).json({
-        ok: true,
-        msg: "imagen eliminada con exito",
-      });
+    res.status(200).json({
+       ok: true,
+       msg: "imagen eliminada con exito",
+    });
     
 
   } catch (error) {
@@ -184,12 +185,6 @@ const deletePicture = async (req, res) => {
   }
 };
 
-//funcion auxiliar
-const estanLosDatos = (id, url, description, prodId) => {
-  let ret = true;
-  if (!id || !url || !description || !prodId) ret = false;
-  return ret;
-};
 
 module.exports = {
   createPic,
