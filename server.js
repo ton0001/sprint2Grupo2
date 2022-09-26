@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const { sequelize } = require('./database/models')
+const {check} = require("express-validator")
 const express = require("express");
 const app = express();
 const swaggerUi = require('swagger-ui-express')
@@ -14,6 +15,9 @@ const cartRoutes = require('./api/routes/cartsRoutes')
 
 const {login} = require("./api/controllers/usersController");
 
+const handleErrors = require("./api/middlewares/handleErros");
+
+
 const YAML = require('yamljs');
 const { Sequelize } = require("sequelize");
 const swaggerDocument = YAML.load('./swagger.yaml');
@@ -25,7 +29,13 @@ app.use(cors())
 app.use('/api/v2/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.get('/api/v2',  (req, res)=>{ res.status(200).send("API funcionando correctamente")})
-app.post('/api/v2/login', login)
+
+
+app.post('/api/v2/login',
+      check('username', 'el username es requerido').not().isEmpty(),
+      check('password', 'la contraseña es requerida').not().isEmpty(),
+      handleErrors,
+      login);
 
 app.use('/api/v2/products',productRoutes)
 app.use('/api/v2/pictures',pictureRoutes)

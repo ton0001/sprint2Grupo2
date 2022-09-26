@@ -53,40 +53,30 @@ const getUserById = (req, res) => {
 //Creo un nuevo Usuario. Debe recibir un body con la informacion del usuario a crear. Responde con la indormacion completa del usuario creado
 
 const createUser = async (req, res) => {
-
+  let user
   try{
-     await models.users.create(req.body)
-    // console.log(user)
+      user =  await models.users.create(req.body)
   }catch(error){
-      // console.log(error)
-      return res.status(500).json({ 
-        ok: true,
-        message: "Hubo un error al crear el usuario1"
-      });
-    
-  }
-
-  try{
-    
-    await models.carts.create({
-      user_id : user.id,
-      
-    })
-
-    res.status(200).json({ 
-      ok: true,
-      message: "Usuario creado correctamente" 
-    });
-
-  }catch(error){{
     return res.status(500).json({ 
-      ok: true,
-      message: "Hubo un error al crear el usuario1"
+          ok: false,
+          message: "Hubo un error al crear el usuario"
+         });
+  }
+  try{
+    await models.carts.create({
+      user_id : user.id })
+
+      res.status(200).json({ 
+        ok: true,
+        message: "Usuario creado correctamente" 
+      });
+
+  }catch(error){
+    return res.status(500).json({ 
+      ok: false,
+      message: "Hubo un error al crear el carrito del usuario"
     });
   }
-
-  }
-
 }
 
 
@@ -221,12 +211,3 @@ module.exports = {
   login
 };
 
-
-const estanLosDatos = (campos)=>{
-  let ret=true
-  if(!campos.email || !campos.username || !campos.password || !campos.firstname || !campos.lastname || !campos.profilepic || !campos.role){
-    ret = false
-  }
-  return ret
-
-}

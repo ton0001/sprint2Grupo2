@@ -32,7 +32,7 @@ router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), up
 router.delete("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), deleteUser);
 
 //PROBANDO DISTITNOS ROLES
-router.get("/", verifyJWT, isAuthenticated(['ADMIN', 'GUEST']), getUsers);
+router.get("/", verifyJWT, isAuthenticated(['GOD', 'ADMIN']), getUsers);
 
 
 router.post('/login',
