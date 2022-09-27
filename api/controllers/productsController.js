@@ -189,29 +189,35 @@ const productController = {
 
    //   ----------------------   //
 
-  listCategory: (req, res) => {
+   listCategory: async (req, res) => {
+    let categoryParam = req.query.category;
     
-    let category = req.query.category;
 
     try {
-      let dbProduct = fs.readFileSync("api/data/products.json", "utf-8");
-      dbProduct = JSON.parse(dbProduct);
+      const product = await models.products.findAll({ 
+        include: [
+          {
+            model: models.category,
+            as: "category",
+            where: {
+              id: categoryParam
+            }
+          },
+        ],
 
-      let categoryFind = dbProduct.find(
-        (el) => el.category.toLowerCase() === category.toLowerCase()
-      );
 
-      if (categoryFind) {
-        let dbProductFilter = dbProduct.filter(
-          (el) => el.category.toLowerCase() === category.toLowerCase()
-        );
-        res.status(200).send(dbProductFilter);
+      })
+      if(product.length === 0){
+        res.status(400).json({
+          ok: false,
+          message: "No existe esa categoria"
+        })
       } else {
-        res.status(404).json({
-          msg: "Not Found",
-        });
+        res.status(200).json(product)
       }
-    } catch (err) {
+      
+      
+ } catch (err) {
       console.log(err);
       res.status(500).json({
         msg: "Error interno",
@@ -232,30 +238,20 @@ const productController = {
   searchProduct: async (req, res) => {
     try {
       let search = req.query.q
-      let newSearch = ''
-      for(let i = 1; i<search.length-1; i++){
-        newSearch += search.charAt(i);
-      }
-      
-      newSearch = `("%${newSearch}%")`
-    
-      const filteredProducto = await sequelize.query("SELECT * FROM `products` WHERE LOWER(title) LIKE LOWER "+newSearch, { type: QueryTypes.SELECT });
-
-      console.log(filteredProducto)
-      /*
-     const search = req.query.q
-     console.log(keyWord)
-      const filteredProducto = await models.products.findAll( {
-        where: {
-          [Op.or] : [new Utils.Where(
-                      new Utils.Fn('LOWER', new Utils.Col('title')), {[Op.like]: `%${search}%`}
-                    ),
-                    new Utils.Where(
-                      new Utils.Fn('LOWER', new Utils.Col('description')), {[Op.like]: `%${search}%`}
-                    )]
-        }
-      } );
-    */
+      search=search.toLowerCase()
+      const whereClause = {
+        [Op.or]: [
+            sequelize.where(
+                sequelize.fn('LOWER', sequelize.col('title')), {[Op.like]: `%${search}%`}
+            ),
+            sequelize.where(
+                sequelize.fn('LOWER', sequelize.col('description')), {[Op.like]: `%${search}%`}
+            )
+        ]
+    }
+      const filteredProducto = await models.products.findAll({
+        where: whereClause
+      })
     
     if (filteredProducto.length === 0) {
        res.status(404).send({ message: "No se encontraron productos" });
