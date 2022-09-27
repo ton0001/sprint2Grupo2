@@ -20,9 +20,9 @@ tags:
   - name: productos
     description: Todos los endpoints de productos
   - name: imagenes
-    description: Todos los endpoints de productos
+    description: Todos los endpoints de las imagenes
   - name: carritos
-    description: Todos los endpoints de productos
+    description: Todos los endpoints de los carritos
 
 components:
   securitySchemes:
@@ -238,7 +238,7 @@ paths:
                       type: string
                       example: Error del servidor
         '401':
-          description: Usuario no autorizado
+          description: Usuario NO autorizado
           content:
             application/json:
               schema:
@@ -254,7 +254,7 @@ paths:
     post:
       tags: 
         - usuarios
-      summary: Crear un usuario. Debe recibir un body con la info del user a crear.
+      summary: Crear un usuario. Debe recibir un body con la info del usuario a crear.
       requestBody:
         required: true
         content:
@@ -353,7 +353,7 @@ paths:
             type: number
       responses:
         '200':    # status code
-          description: Responde con la información completa del user con el id buscado.
+          description: Responde con la información completa del usuario con el id buscado.
           content:
             application/json:
               schema: 
@@ -393,7 +393,7 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Usuario on encontrado
+                    example: Usuario no encontrado
 
         '401':
           description: No autorizado
@@ -422,10 +422,11 @@ paths:
                   message:
                     type: string
                     example: Error del servidor
+    
     put:
       tags: 
         - usuarios
-      summary: Actualiza el user identificado con id. Debe recibir un body con la info del user a modificar.
+      summary: Actualiza el usuario identificado con id. Debe recibir en el body la info del usuario a modificar.
       security:
         - bearerAuth: []
       parameters:
@@ -530,6 +531,7 @@ paths:
                   message:
                     type: string
                     example: Error del servidor al obtener el usuario
+   
     delete:
       tags: 
         - usuarios
@@ -546,7 +548,7 @@ paths:
             type: number
       responses: 
         '200':
-          description: Usuario {id} eliminado
+          description: Usuario eliminado correctamente
           content:
             application/json:
               schema:
@@ -604,7 +606,7 @@ paths:
     get:
       tags: 
         - usuarios
-      summary: Recupera el cart del user identificado con id.
+      summary: Recupera el carrito del usuario identificado con id.
       security:
         - bearerAuth: []
       parameters:
@@ -617,7 +619,7 @@ paths:
           type: number
       responses:
         '200':    # status code
-          description: Responde con un array conteniendo los products del user solicitado.
+          description: Responde con un array conteniendo los productos del usuario solicitado.
           content:
             application/json:
               schema: 
@@ -674,7 +676,7 @@ paths:
     put:
       tags:
         - usuarios
-      summary: Actualiza el cart del user identificado con id solicitado.
+      summary: Actualiza el carrit del usuario identificado con id solicitado.
       security:
         - bearerAuth: []
       parameters:
@@ -702,7 +704,7 @@ paths:
                       example: 2
       responses:
         '200':    # status code
-          description: Responde con la info completa del cart modificado.
+          description: Responde con la info completa del carrito modificado.
           content:
             application/json:
               schema: 
@@ -771,7 +773,7 @@ paths:
           schema:
             type: string
           required: false
-          description: Permite filtrsr por categoria
+          description: Permite filtrar por categoria
           
           
       responses:
@@ -980,7 +982,7 @@ paths:
     get:
       tags: 
         - productos
-      summary: Recupera el product con el id solicitado. 
+      summary: Recupera el producto con el id solicitado. 
       security:
         - bearerAuth: []
       parameters:
@@ -1064,7 +1066,7 @@ paths:
     put:
       tags: 
         - productos
-      summary: Actualiza el product identificado con id. Debe recibir un body con la info del producto a modificar.
+      summary: Actualiza el producto identificado con id. Debe recibir un body con la info del producto a modificar.
       security:
         - bearerAuth: []
       parameters:
@@ -1182,7 +1184,7 @@ paths:
     delete:
       tags: 
         - productos
-      summary: Elimina el product identificado con id. 
+      summary: Elimina el producto identificado con id. 
       security:
         - bearerAuth: []
       parameters:
@@ -1251,7 +1253,7 @@ paths:
     get:
       tags: 
         - productos
-      summary:  Recupera una lista de products que tienen el atributo mostwanted establecido en true.
+      summary:  Recupera una lista de productos que tienen el atributo mostwanted establecido en true.
       security:
         - bearerAuth: []
       responses:
@@ -1896,7 +1898,7 @@ paths:
                     example: Error de servidor
   
   
-  /cart/{id}:
+  /carts/{id}:
     get:
       tags: 
         - carritos

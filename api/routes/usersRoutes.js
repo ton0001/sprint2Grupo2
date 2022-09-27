@@ -26,6 +26,7 @@ router.get('/', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUEST']), getUsers)
 router.get("/:id", getUserById);
 router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']),
       check ('email').custom(verifyUnique.verifyEmail),
+      check('email', 'formato de email no es valido').isEmail(),
       check ('username').custom(verifyUnique.verifyUsername),
       handleErrors, 
       updateUser);
