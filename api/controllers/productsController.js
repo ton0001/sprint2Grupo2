@@ -239,7 +239,7 @@ const productController = {
       
       newSearch = `("%${newSearch}%")`
     
-      const filteredProducto = await sequelize.query("SELECT * FROM `products` WHERE LOWER(title) LIKE LOWER "+newSearch, { type: QueryTypes.SELECT });
+      const filteredProducto = await sequelize.query("SELECT * FROM `products` WHERE LOWER(title) LIKE LOWER "+newSearch+ " UNION SELECT * FROM `products` WHERE LOWER(description) LIKE LOWER "+newSearch, { type: QueryTypes.SELECT });
 
       console.log(filteredProducto)
       /*
