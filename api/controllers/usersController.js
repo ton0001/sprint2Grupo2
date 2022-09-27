@@ -11,6 +11,7 @@ todos los usuarios del sistema */
 const getUsers = async (req, res) => {
   try {
     const users = await models.users.findAll({
+<<<<<<< HEAD
       include: [
         {
           model: models.carts,
@@ -32,6 +33,20 @@ const getUsers = async (req, res) => {
       ],
     });
     res.json(users);
+=======
+      include: [{
+        model: models.carts,
+        as: 'cart',
+        attributes: {exclude: ['user_id']},
+        include: [{
+          model: models.product_cart,
+          as: 'cart_products',
+          attributes: ['product_id', 'quantity', 'created_at', 'updated_at'],
+      }]
+      }]
+    }) 
+    res.send(users);
+>>>>>>> bb91286f6e58cbc7d967792d4e3e9d57aa935290
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Error al obtener los usuarios' });
