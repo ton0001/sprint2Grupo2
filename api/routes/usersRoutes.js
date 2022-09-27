@@ -1,5 +1,5 @@
 const express = require("express");
-const {check} = require("express-validator")
+const {check, checkBody} = require("express-validator")
 
 const router = express.Router();
 const {
@@ -34,7 +34,7 @@ router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']),
       handleErrors, 
       updateUser);
 
-router.post('/', 
+router.post('/',
       check('username', 'el username es requerido').not().isEmpty(),
       check('email', 'el email es requerido').not().isEmpty(),
       check('password', 'la contraseña es requerida').not().isEmpty(),

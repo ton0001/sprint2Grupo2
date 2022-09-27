@@ -31,10 +31,12 @@ const getUsers = async (req, res) => {
         },
       ],
     });
-    res.json(users);
+    res.satuts(200).json(users);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error al obtener los usuarios' });
+    res.status(500).json({
+      ok: false,
+      message: 'Error al obtener los usuarios' });
     const usersArray = JSON.parse(users);
     res.json(usersArray);
   }
@@ -73,14 +75,14 @@ const getUserById = async (req, res) => {
     });
    
     if (!user) {
-      res.status(404).json({ message: 'Usuario no encontrado' });
+      res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
     }
     else{
       res.status(200).json(user);
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error al obtener el usuario' });
+    res.status(500).json({ ok: false, message: 'Error al obtener el usuario' });
   }
 };
 
@@ -92,6 +94,8 @@ const createUser = async (req, res) => {
   let user
   try{
       user =  await models.users.create(req.body)
+      userCreated = await models.users.findOne({where: {username: req.body.username}})
+
   }catch(error){
     return res.status(500).json({ 
           ok: false,
@@ -102,10 +106,10 @@ const createUser = async (req, res) => {
     await models.carts.create({
       user_id : user.id })
 
-      res.status(200).json({ 
-        ok: true,
-        message: "Usuario creado correctamente" 
-      });
+      res.status(200).json(
+        userCreated.dataValues
+      );
+
 
   }catch(error){
     return res.status(500).json({ 
@@ -127,22 +131,26 @@ const updateUser = async (req, res) => {
     const user = await models.users.findOne({
       where: { id: req.params.id },
     });
-    if (user) {
-      const updatedUser = await models.users.update(req.body, {
-        where: { id: req.params.id },
-      });
-      res.status(200).json({ message: " Usuario actualizado correctamente"}) 
+
+    const updatedUser = await models.users.update(req.body, {
+      where: { id: req.params.id },
+    });
+    const userUpdated = await models.users.findByPk(req.params.id)
+
+    if (updatedUser) {
+      res.status(200).json(
+        userUpdated.dataValues
+    );
     } else if (!user) {
-      res.status(400).json({ message: 'Solicitud Incorrecta' });
+      res.status(400).json({ ok: false, message: "Solicitud Incorrecta" });
     } else {
-      res.status(404).json({ message: 'Usuario no encontrado' });
+      res.status(404).json({ ok: false, message: "Usuario no encontrado" });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error al actualizar el usuario' });
+    res.status(500).json({ok: false,  message: "Error al actualizar el usuario" });
   }
 };
-
 
 /*Elimina un usuario identificado con id. Cuando se elimina un usuario, 
 antes debe verificar vaciarse su carrito. Responde con informacion sobre la eliminacion realizada.
@@ -176,7 +184,7 @@ const deleteUserById = async (req, res) => {
       ],
     });
     if (!user) {
-      res.status(404).json({ message: 'Usuario no encontrado' });
+      res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
     }
 
     console.log('PRODUCTS:', user.carts.product_carts.length);
@@ -185,15 +193,16 @@ const deleteUserById = async (req, res) => {
         where: { user_id: req.params.id },
       });
       await user.destroy();
-      res.status(200).json({ message: 'Usuario eliminado!!!!' });
+      res.status(200).json({ ok: true, message: 'Usuario eliminado!!!!' });
     } else {
       res.status(400).json({
+        ok: false,
         message: 'No se puede eliminar un usuario con productos en el carrito',
       });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error al eliminar el usuario' });
+    res.status(500).json({ ok: false, message: 'Error al eliminar el usuario' });
   }
 };
 
@@ -211,7 +220,7 @@ const login = async (req, res)=>{
       if (!user_exist){
         return res.status(400).json({
           ok: false,
-          mgs: "Wrong password or username"
+          message: 'Wrong password or username'
         })
       }
 
@@ -223,9 +232,9 @@ const login = async (req, res)=>{
       const token = await generateJWT(userLog)
 
       res.status(200).json({
-          "success": true,
-          "message": "Authorized Login Success",
-          "user": userLog,
+          'success': true,
+          'message': 'Authorized Login Success',
+          'user': userLog,
           token,
       })
 
@@ -234,7 +243,7 @@ const login = async (req, res)=>{
       console.log(error)
       res.status(500).json({
           ok:false,
-          mgs: "Error in login"
+          mgs: 'Error in login'
       })
 
   }

@@ -11,7 +11,7 @@ const verifyUnique = {
             where: [{email: email}],
           }) 
           if (exist) {
-            throw new Error('El email ya se encuentra regustrado')
+            throw new Error('El email ya se encuentra registrado')
         }
     },
 
