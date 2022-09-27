@@ -200,10 +200,10 @@ paths:
                     username:
                       type: string
                       example: juanperez
-                    firstname:
+                    first_name:
                       type: string
                       example: Juan
-                    lastname:
+                    last_name:
                       type: string
                       example: Perez
                     profilepic:
@@ -271,10 +271,10 @@ paths:
                   password: 
                     type: string
                     example: '123456'
-                  firstname:
+                  first_name:
                     type: string
                     example: juan
-                  lastname:
+                  last_name:
                     type: string
                     example: perez
                   profilepic:
@@ -297,10 +297,10 @@ paths:
                   username:
                     type: string
                     example: juanperez
-                  firstname:
+                  first_name:
                     type: string
                     example: juan
-                  lastname:
+                  last_name:
                     type: string
                     example: perez
                   profilepic:
@@ -368,10 +368,10 @@ paths:
                   username:
                     type: string
                     example: juanperez
-                  firstname:
+                  first_name:
                     type: string
                     example: juan
-                  lastname:
+                  last_name:
                     type: string
                     example: perez
                   profilepic:
@@ -449,10 +449,10 @@ paths:
                   username:
                     type: string
                     example: juanperez
-                  firstname:
+                  first_name:
                     type: string
                     example: juan
-                  lastname:
+                  last_name:
                     type: string
                     example: perez
                   profilepic:
@@ -478,10 +478,10 @@ paths:
                   username:
                     type: string
                     example: juanperez
-                  firstname:
+                  first_name:
                     type: string
                     example: juan
-                  lastname:
+                  last_name:
                     type: string
                     example: perez
                   profilepic:
@@ -772,12 +772,6 @@ paths:
             type: string
           required: false
           description: Permite filtrsr por categoria
-        - in : query
-          name: q
-          schema:
-            type: string
-          required: false
-          description: Palabra clave para busqueda. 
           
           
       responses:

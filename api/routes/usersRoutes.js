@@ -29,7 +29,7 @@ router.get("/:id", getUserById);
 
 router.put('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
 router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), updateUser);
-router.delete("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), deleteUser);
+router.delete("/:id", deleteUser);
 
 //PROBANDO DISTITNOS ROLES
 router.get("/", verifyJWT, isAuthenticated(['ADMIN', 'GUEST']), getUsers);
@@ -45,8 +45,8 @@ router.post("/",
       check('username', 'el username es requerido').not().isEmpty(),
       check('email', 'el email es requerido').not().isEmpty(),
       check('password', 'la contraseña es requerida').not().isEmpty(),
-      check('first_name', 'la contraseña es requerida').not().isEmpty(),
-      check('last_name', 'la contraseña es requerida').not().isEmpty(),
+      check('first_name', 'first name es requerida').not().isEmpty(),
+      check('last_name', 'last name es requerida').not().isEmpty(),
       check('email', 'formato de email no es valido').isEmail(),
       check ('email').custom(verifyUnique.verifyEmail),
       check ('username').custom(verifyUnique.verifyUsername),

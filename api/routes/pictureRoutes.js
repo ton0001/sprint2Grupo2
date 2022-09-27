@@ -28,7 +28,7 @@ router.post('/', verifyJWT, isAuthenticated(['GOD']),
 router.put('/:id', verifyJWT, isAuthenticated(['GOD']),
         check('url', 'se necesita una url').not().isEmpty(), 
         check('description', 'se necesita una descripcion').not().isEmpty(), 
-        check('producto_id', 'se necesita una product_id').not().isEmpty(), 
+        check('product_id', 'se necesita una product_id').not().isEmpty(), 
         handleErrors, 
         updatePic);
 router.delete('/:id', verifyJWT, isAuthenticated(['GOD']), deletePicture)

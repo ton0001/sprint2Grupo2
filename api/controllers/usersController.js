@@ -123,39 +123,81 @@ const updateUser = (req, res) => {
 
 //Elimina un usuario identificado con id. Cuando se elimina un usuario, antes debe vaciarse su carrito. Responde con informacion sobre la eliminacion realizada.
 
-const deleteUser = (req, res) => {
+// const deleteUser = (req, res) => {
+//   try {
+//     let users = fs.readFileSync(
+//       path.join(__dirname, "../data/users.json"),
+//       "utf-8"
+//     );
+//     users = JSON.parse(users);
+//     const user = users.find((user) => user.id === parseInt(req.params.id));
+//     if (user) {
+//       const index = users.indexOf(user);
+//       users.splice(index, 1);
+//       fs.writeFileSync(
+//         path.join(__dirname, "../data/users.json"),
+//         JSON.stringify(users)
+//       );
+//       let carts = fs.readFileSync(path.join(__dirname, "../data/carts.json"))
+//       carts = JSON.parse(carts);
+//       const cartUser = carts.find(cart => cart.user === parseInt(req.params.id))
+//       if(cartUser){
+//         const index = carts.indexOf(cartUser);
+//         carts.splice(index, 1);
+//         fs.writeFileSync(
+//           path.join(__dirname, "../data/carts.json"),
+//           JSON.stringify(carts)
+//         )
+//       }
+//       res.send({ message: `Usuario ${user.id} eliminado` });
+//     } else {
+//       res.status(404).send({ message: "Usuario no encontrado" });
+//     }
+//   } catch (error) {
+//     res.status(500).send({ message: "Error al eliminar el usuario" });
+//   }
+// };
+const deleteUser = async (req, res) => {
   try {
-    let users = fs.readFileSync(
-      path.join(__dirname, "../data/users.json"),
-      "utf-8"
-    );
-    users = JSON.parse(users);
-    const user = users.find((user) => user.id === parseInt(req.params.id));
-    if (user) {
-      const index = users.indexOf(user);
-      users.splice(index, 1);
-      fs.writeFileSync(
-        path.join(__dirname, "../data/users.json"),
-        JSON.stringify(users)
-      );
-      let carts = fs.readFileSync(path.join(__dirname, "../data/carts.json"))
-      carts = JSON.parse(carts);
-      const cartUser = carts.find(cart => cart.user === parseInt(req.params.id))
-      if(cartUser){
-        const index = carts.indexOf(cartUser);
-        carts.splice(index, 1);
-        fs.writeFileSync(
-          path.join(__dirname, "../data/carts.json"),
-          JSON.stringify(carts)
-        )
-      }
-      res.send({ message: `Usuario ${user.id} eliminado` });
-    } else {
-      res.status(404).send({ message: "Usuario no encontrado" });
+    const user = await models.users.findOne({
+      where: { id: req.params.id },
+    });
+    const cart = await models.carts.findOne({
+      where: { user_id: req.params.id },
+    });
+
+    console.log(user.dataValues.id)
+    console.log(cart.dataValues.id)
+
+      if (cart.dataValues.id) {
+      const deletedCart = await models.carts.destroy({
+        where: {
+          user_id: req.params.id,
+        },
+      });
+      console.log(deleteCart)
+       res.status(200).json(deletedCart);
     }
-  } catch (error) {
-    res.status(500).send({ message: "Error al eliminar el usuario" });
+  }catch(error){
+    console.log(error)
   }
+  //   if(user.dataValues.id) {
+  //     console.log("enrta")
+      
+  //     const deletedUser = await models.users.destroy({
+  //       where: { id: req.params.id },
+  //     });
+  //     res.status(200).json(deletedUser);
+  //     console.log(user)
+  //   } else if (!user) {
+  //     res.status(400).json({ message: "Solicitud Incorrecta" });
+  //   } else {
+  //     res.status(404).json({ message: "Usuario no encontrado" });
+  //   }
+  // } catch (error) {
+  //   console.log(error);
+  //   res.status(500).json({ message: "Error al eliminar el usuario" });
+   
 };
 
 
