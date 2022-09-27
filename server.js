@@ -40,7 +40,6 @@ app.post('/api/v2/login',
     login);
 
 
-
 app.use('/api/v2/products',productRoutes)
 app.use('/api/v2/pictures',pictureRoutes)
 app.use('/api/v2/carts', cartRoutes)

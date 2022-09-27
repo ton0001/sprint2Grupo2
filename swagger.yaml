@@ -310,7 +310,7 @@ paths:
                     type: string
                     default: GUEST
         '400':
-          description: Faltan datos para crear el usuario
+          description: Bad request
           content:
             application/json:
               schema:
@@ -321,7 +321,7 @@ paths:
                     default: false
                   message:
                     type: string
-                    example: Faltan datos para crear el usuario
+                    example: Faltan datos para crear el usuario o algunos campos ya se encuentran utilizados
         '500':
           description: Server Error
           content:
@@ -394,6 +394,19 @@ paths:
                   message:
                     type: string
                     example: Usuario no encontrado
+        '403':
+          description: Usuario no autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Usuario no autorizado
 
         '401':
           description: No autorizado
@@ -556,7 +569,7 @@ paths:
                 properties:
                   ok:
                     type: boolean
-                    default: false
+                    default: true
                   message:
                     type: string
                     example: Usuario eliminado correctamente
