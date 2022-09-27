@@ -8,7 +8,7 @@ const {
   createUser,
   updateUser,
   deleteUser,
-  login
+  login,
 } = require("../controllers/usersController");
 
 
@@ -20,28 +20,16 @@ const isAuthenticated = require('../middlewares/verifyRoles');
 const handleErrors = require("../middlewares/handleErros");
 
 
-const { verifyUnique } = require("../../helpers/verifyUnique");
+const { verifyUnique } = require('../../helpers/verifyUnique');
 
-
-router.get('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), cartsController.listCart);
-
+router.get('/', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUEST']), getUsers);
 router.get("/:id", getUserById);
-
-router.put('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
-router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), updateUser);
-router.delete("/:id", deleteUser);
-
-//PROBANDO DISTITNOS ROLES
-router.get("/", verifyJWT, isAuthenticated(['ADMIN', 'GUEST']), getUsers);
-
-
-router.post('/login',
-      check('username', 'el username es requerido').not().isEmpty(),
-      check('password', 'la contraseña es requerida').not().isEmpty(),
-      handleErrors,
-      login);
-
-router.post("/", 
+router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']),
+      check ('email').custom(verifyUnique.verifyEmail),
+      check ('username').custom(verifyUnique.verifyUsername),
+      handleErrors, 
+      updateUser);
+router.post('/', 
       check('username', 'el username es requerido').not().isEmpty(),
       check('email', 'el email es requerido').not().isEmpty(),
       check('password', 'la contraseña es requerida').not().isEmpty(),
@@ -52,12 +40,23 @@ router.post("/",
       check ('username').custom(verifyUnique.verifyUsername),
       handleErrors,
       createUser);
+router.delete("/:id", deleteUser);
+
+router.get('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), cartsController.listCart);
+router.put('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
+router.get( '/:id/cart',
+      verifyJWT,
+      isAuthenticated(["GOD", "ADMIN", "GUESTID"]),
+      cartsController.listCart
+);
 
 
 
+router.post('/login',
+      check('username', 'el username es requerido').not().isEmpty(),
+      check('password', 'la contraseña es requerida').not().isEmpty(),
+      handleErrors,
+      login);
 
 
 module.exports = router;
-
-
-

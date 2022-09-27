@@ -4,27 +4,27 @@ const { sequelize } = require('./database/models')
 const {check} = require("express-validator")
 const express = require("express");
 const app = express();
-const swaggerUi = require('swagger-ui-express')
-const cors = require('cors')
+const swaggerUi = require("swagger-ui-express");
+const cors = require("cors");
 const PORT = process.env.PORT;
 
 const productRoutes = require("./api/routes/productsRoutes");
 const usersRoutes = require("./api/routes/usersRoutes");
-const pictureRoutes = require('./api/routes/pictureRoutes')
-const cartRoutes = require('./api/routes/cartsRoutes')
+const pictureRoutes = require("./api/routes/pictureRoutes");
+const cartRoutes = require("./api/routes/cartsRoutes");
 
-const {login} = require("./api/controllers/usersController");
+const { login } = require("./api/controllers/usersController");
 
 const handleErrors = require("./api/middlewares/handleErros");
 
 
 const YAML = require('yamljs');
-const { Sequelize } = require("sequelize");
-const swaggerDocument = YAML.load('./swagger.yaml');
 
+const { Sequelize } = require("sequelize");
+const swaggerDocument = YAML.load("./swagger.yaml");
 
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
 app.use('/api/v2/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
