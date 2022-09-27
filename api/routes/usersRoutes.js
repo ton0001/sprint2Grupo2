@@ -5,7 +5,7 @@ const {
   getUserById,
   createUser,
   updateUser,
-  deleteUser,
+  deleteUserById,
   login,
 } = require("../controllers/usersController");
 
@@ -30,12 +30,7 @@ router.put(
   cartsController.updateCart
 );
 router.put("/:id", updateUser);
-router.delete(
-  "/:id",
-  verifyJWT,
-  isAuthenticated(["GOD", "ADMINID", "GUESTID"]),
-  deleteUser
-);
+router.delete("/:id", deleteUserById);
 
 router.post("/login", login);
 

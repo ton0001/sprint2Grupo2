@@ -110,7 +110,7 @@ const createUser = (req, res) => {
 /*Actualiza un usuario identificado con id. 
 Debe recibir un body con la informacion del usuario a actualizar. 
 Responde con la informacion completa del usuario actualizado.
-responder con error 400 si el request es incorrecto
+responder con error 400 si es una bad requesta
 responder con error 404 si el usuario no existe
 responder con error 500 si hay un error en el servidor*/
 
@@ -124,6 +124,8 @@ const updateUser = async (req, res) => {
         where: { id: req.params.id },
       });
       res.status(200).json(updatedUser);
+    } else if (!user) {
+      res.status(400).json({ message: "Solicitud Incorrecta" });
     } else {
       res.status(404).json({ message: "Usuario no encontrado" });
     }
@@ -133,42 +135,29 @@ const updateUser = async (req, res) => {
   }
 };
 
-//Elimina un usuario identificado con id. Cuando se elimina un usuario, antes debe vaciarse su carrito. Responde con informacion sobre la eliminacion realizada.
+/*Elimina un usuario identificado con id. Cuando se elimina un usuario, 
+antes debe vaciarse su carrito. Responde con informacion sobre la eliminacion realizada.
+200 OK.
+400 Bad Request (si la llamada es incorrecta)
+404 Not Found (si el user no existe)
+500 Server Error.*/
 
-const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
   try {
-    let users = fs.readFileSync(
-      path.join(__dirname, "../data/users.json"),
-      "utf-8"
-    );
-    users = JSON.parse(users);
-    const user = users.find((user) => user.id === parseInt(req.params.id));
+    const user = await models.users.findOne({
+      where: { id: req.params.id },
+    });
     if (user) {
-      const index = users.indexOf(user);
-      users.splice(index, 1);
-      fs.writeFileSync(
-        path.join(__dirname, "../data/users.json"),
-        JSON.stringify(users)
-      );
-      let carts = fs.readFileSync(path.join(__dirname, "../data/carts.json"));
-      carts = JSON.parse(carts);
-      const cartUser = carts.find(
-        (cart) => cart.user === parseInt(req.params.id)
-      );
-      if (cartUser) {
-        const index = carts.indexOf(cartUser);
-        carts.splice(index, 1);
-        fs.writeFileSync(
-          path.join(__dirname, "../data/carts.json"),
-          JSON.stringify(carts)
-        );
-      }
-      res.send({ message: `Usuario ${user.id} eliminado` });
+      const deletedUser = await models.users.destroy({
+        where: { id: req.params.id },
+      });
+      res.status(200).json(deletedUser);
     } else {
-      res.status(404).send({ message: "Usuario no encontrado" });
+      res.status(404).json({ message: "Usuario no encontrado" });
     }
   } catch (error) {
-    res.status(500).send({ message: "Error al eliminar el usuario" });
+    console.log(error);
+    res.status(500).json({ message: "Error al eliminar el usuario" });
   }
 };
 
