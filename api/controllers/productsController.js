@@ -28,6 +28,7 @@ const productController = {
       res.status(200).json(getAllProduct);
     } catch (error) {
       res.status(500).json({
+        ok: false,
         message: "Error del servidor al cargar los productos",
       });
       console.log("Catch error" + error);
@@ -63,8 +64,10 @@ const productController = {
         res.status(200).json(oneProduct);
       }
     } catch (error) {
-      res.send(error);
-      console.log("Catch error " + error);
+      res.status(500).json({
+        ok: false,
+        message: "Error del servidor "
+      });
     }
   },
 
@@ -83,10 +86,9 @@ const productController = {
         mostwanted: req.body.mostwanted,
         stock: req.body.stock,
       });
-
+      const producto = await models.products.findOne({where: {title: req.body.title}})
       res.status(200).json({
-        ok: false,
-        message: "Producto Agregado",
+        producto
       });
     } catch (error) {
       res.status(500).json({
@@ -117,14 +119,15 @@ const productController = {
           },
         }
       );
-
+      const producto = await models.products.findByPk(req.params.id)
       res.status(200).json({
-        ok: true,
-        message: "producto modificado",
+        producto
       });
     } catch (error) {
-      console.log(error);
-      res.send("Error inesperado");
+     res.status(500).json({
+      ok: false, 
+      message: "Error del servidor",
+     })
     }
   },
 
@@ -172,9 +175,12 @@ const productController = {
 
         if(productImage.pictures.length === 0){
        
-            res.json("Este producto no tiene imagenes asociadas")
+            res.status(204).json({
+              ok: true, 
+              message: "Este producto no tiene imagenes asociadas"
+        })
         } else {
-          res.json(productImage)
+          res.status(200).json(productImage)
         }
       
      
@@ -220,7 +226,8 @@ const productController = {
  } catch (err) {
       console.log(err);
       res.status(500).json({
-        msg: "Error interno",
+        ok: false,
+        message: "Error interno",
       });
     }
   },
@@ -249,18 +256,19 @@ const productController = {
             )
         ]
     }
-      const filteredProducto = await models.products.findAll({
+
+    const filteredProducto = await models.products.findAll({
         where: whereClause
       })
     
     if (filteredProducto.length === 0) {
-       res.status(404).send({ message: "No se encontraron productos" });
+       res.status(404).json({ ok: false, message: "No se encontraron productos" });
        } else {
-        res.json(filteredProducto)
+        res.staus(200).json(filteredProducto)
        }
     } catch (error) {
       console.log(error)
-      res.status(500).send({ message: "Error al obtener los productos" });
+      res.status(500).json({ ok: false, message: "Error al obtener los productos" });
     }
   },
 
@@ -286,7 +294,10 @@ const productController = {
         })
       } else {
         
-        res.status(400).json("El producto que desea eliminar no existe en nuestra base de datos")
+        res.status(400).json({
+          ok: false, 
+          message: "El producto que desea eliminar no existe en nuestra base de datos"
+        })
       }
         
       

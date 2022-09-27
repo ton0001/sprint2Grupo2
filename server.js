@@ -28,7 +28,7 @@ app.use(cors());
 
 app.use('/api/v2/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
-app.get('/api/v2',  (req, res)=>{ res.status(200).send("API funcionando correctamente")})
+app.get('/api/v2',  (req, res)=>{ res.status(200).json("API funcionando correctamente")})
 
 
 

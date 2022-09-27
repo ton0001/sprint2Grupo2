@@ -11,7 +11,7 @@ const isAuthenticated = require('../middlewares/verifyRoles');
 // router.get('/', productController.allProduct)
 router.get('/', verifyJWT, productController.rutaProducts)
 router.get('/mostwanted', verifyJWT,  productController.mostWanted)
-router.get("/search", verifyJWT, productController.searchProduct);
+router.get("/search", verifyJWT , productController.searchProduct);
 router.get('/:id/pictures', verifyJWT, productController.getPicByProductId)
 router.get('/:id', verifyJWT, productController.oneProduct)
 router.post('/', verifyJWT, isAuthenticated(['GOD']), 
