@@ -124,60 +124,6 @@ const updatePic = async (req, res) => {
     })
   } 
   
-  // try {
-    //     // trae los datos necesarios desde el body
-    //     const bodyUrl = req.body.url;
-    //     const bodyDescription = req.body.description;
-    //     const bodyProductId = req.body.product_id;
-
-      
-    //     //si no llegan los datos requeridos lanza una respuesta de error
-    //     if(!bodyUrl && !bodyProductId && !bodyUrl){
-    //         return res.status(400).json({
-    //             ok: false,
-    //             msg: 'faltan campos requeridos'
-    //         })
-    //     }
-    
-    //     if(bodyUrl){
-    //         await models.pictures.update({
-    //             url : bodyUrl,
-                
-    //         },
-    //         {
-    //             where: {id: req.params.id}
-    //         });
-    //     }
-        
-    //     if(bodyDescription){
-    //         await models.pictures.update({
-    //             description : bodyDescription,
-    //         },
-    //         {
-    //             where: {id: req.params.id}
-    //         });
-    //     }
-    //     if(bodyProductId){
-    //         await models.pictures.update({
-    //             product_id : bodyProductId,
-    //         },
-    //         {
-    //             where: {id: req.params.id}
-    //         });
-    //     }
-    
-    //     res.status(200).json({
-    //       ok: true,
-    //       msg: "imagen actualizada con exito",
-    //     });
-    
-    //   } catch (error) {
-    //     console.log(error);
-    //     res.status(500).json({
-    //       ok: false,
-    //       msg: "server error",
-    //     });
-    //   }
 };
 
 //funcion para eliminar una picture
