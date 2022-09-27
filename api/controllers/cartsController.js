@@ -79,9 +79,9 @@ const controllerCart = {
                 id: product.dataValues.product_id
               }
             });
-          console.log((await models.products.findByPk(product.dataValues.product_id, {
-            attributes: ['id', 'stock']
-          })).dataValues)
+          // console.log((await models.products.findByPk(product.dataValues.product_id, {
+          //   attributes: ['id', 'stock']
+          // })).dataValues)
         })  
       }
 
@@ -95,7 +95,7 @@ const controllerCart = {
         }
       })
 
-      //Espero un tiempo para que cargue la base de datos?
+      //¿Espero un tiempo para que cargue la base de datos?
       setTimeout(async ()=>{
         //Envio respustas segun corresponda
         if(noStock){
@@ -144,9 +144,9 @@ const controllerCart = {
                   id: product.product_id
                 }
               });
-            console.log((await models.products.findByPk(product.product_id, {
-              attributes: ['id', 'stock']
-            })).dataValues)
+            // console.log((await models.products.findByPk(product.product_id, {
+            //   attributes: ['id', 'stock']
+            // })).dataValues)
           })  
           
           //Obtengo los productos del cart actualizado
