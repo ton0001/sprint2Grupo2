@@ -1,6 +1,8 @@
 const { Op } = require("sequelize");
 const initModels = require("../../database/models/init-models");
-const { sequelize } = require("../../database/models");
+const { sequelize, Sequelize } = require("../../database/models");
+const Utils = Sequelize.Utils;
+const { QueryTypes } = require('sequelize');
 
 const models = initModels(sequelize);
 
@@ -224,42 +226,26 @@ const productController = {
 
   searchProduct: async (req, res) => {
     try {
-      const keyWord = req.query.q;
-      const filteredProducto = await models.products.findAll({
-        where: {
-          [Op.or]: [
-            //title: {[Op.like]: `%${req.query.q}%`}
-            {
-              title: {
-                [Op.like]: "%" + keyWord + "%",
-              },
-            },
-            {
-              description: {
-                [Op.like]: "%" + keyWord + "%",
-              },
-            },
-          ],
-        },
-
-        // title: { [Op.like]: "%" + keyWord + "%" }
-        /*[Op.or]: [
-          {title:       { [Op.like]: `%${search}%`}},
-          {description: { [Op.like]: `%${search}%`}}
-        ]
-}*/
-        // where: { [Op.or]: [{title: {
-        //   [Op.substring]: "%" + keyWord + "%"}
-        // }] }
-        //  title: {[Op.substring]: `%${req.query.q}%`} ]}
-      });
-
-      if (filteredProducto.length === 0) {
-        res.status(404).send({ message: "No se encontraron productos" });
-      } else {
-        res.json(filteredProducto);
+      let search = req.query.q
+      let newSearch = ''
+      for(let i = 1; i<search.length-1; i++){
+        newSearch += search.charAt(i);
       }
+      
+      newSearch = `("%${newSearch}%")`
+    
+      const filteredProducto = await sequelize.query("SELECT * FROM `products` WHERE LOWER(title) LIKE LOWER "+newSearch+ " UNION SELECT * FROM `products` WHERE LOWER(description) LIKE LOWER "+newSearch, { type: QueryTypes.SELECT });
+
+      console.log(filteredProducto)
+  
+    
+    if (filteredProducto.length === 0) {
+       res.status(404).send({ message: "No se encontraron productos" });
+       } else {
+        res.json(filteredProducto)
+       }
     } catch (error) {
+      console.log(error)
       res.status(500).send({ message: "Error al obtener los productos" });
     }
   },
