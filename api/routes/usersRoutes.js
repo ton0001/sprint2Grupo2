@@ -7,7 +7,7 @@ const {
   getUserById,
   createUser,
   updateUser,
-  deleteUser,
+  deleteUserById,
   login,
 } = require("../controllers/usersController");
 
@@ -41,7 +41,9 @@ router.post('/',
       check ('username').custom(verifyUnique.verifyUsername),
       handleErrors,
       createUser);
-router.delete("/:id", deleteUser);
+
+
+router.delete("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), deleteUserById);
 
 router.get('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), cartsController.listCart);
 router.put('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
