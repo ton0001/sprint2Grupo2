@@ -277,6 +277,12 @@ const productController = {
        const searchingProductToDelete = await models.products.findByPk(id);
        
       if(searchingProductToDelete != undefined) {
+        await models.pictures.destroy({
+          where: {product_id : req.params.id}
+        })
+        await models.product_cart.destroy({
+          where: {product_id : req.params.id}
+        })
         await searchingProductToDelete.destroy();
         res.status(200).json({
           ok: true,

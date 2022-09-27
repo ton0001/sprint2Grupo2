@@ -23,7 +23,7 @@ router.get('/:id', verifyJWT, getPictureById);
 router.post('/', verifyJWT, isAuthenticated(['GOD']), 
         check('url', 'se necesita una url').not().isEmpty(), 
         check('description', 'se necesita una descripcion').not().isEmpty(), 
-        check('producto_id', 'se necesita una producto para asociarlo').not().isEmpty(), 
+        check('product_id', 'se necesita una producto para asociarlo').not().isEmpty(), 
         handleErrors,
         createPic);
 

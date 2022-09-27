@@ -640,7 +640,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    product:
+                    product_id:
                       type: number
                       example: 64
                     quantity:
@@ -709,7 +709,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    product:
+                    product_id:
                       type: number
                       example: 64
                     quantity:
@@ -823,8 +823,8 @@ paths:
                             type: string
                             example: www.pic.com/img.jpg
                     category:
-                      type: string
-                      example: Rotiseria
+                      type: number
+                      example: 2
                     mostwanted:
                       type: boolean
                       example: true
@@ -904,7 +904,8 @@ paths:
                           type: string
                           example: www.pic.com/galleta.jpg
                   category:
-                    type: string
+                    type: number
+                    example: 2
                   mostwanted:
                     type: boolean
                     default: false
@@ -942,8 +943,8 @@ paths:
                             type: string
                             example: www.pic.com/galletas.jpg
                     category:
-                      type: string
-                      example: Merienda
+                      type: number
+                      example: 2
                     mostwanted:
                       type: boolean
                       default: false
@@ -1035,7 +1036,8 @@ paths:
                             type: string
                             example: www.pic.com/galleta.jpg
                     category:
-                      type: string
+                      type: number
+                      example: 4
                     mostwanted:
                       type: boolean
                       default: false
@@ -1118,8 +1120,8 @@ paths:
                           type: string
                           example: wwww.pic.com/galletas/jpg
                   category:
-                    type: string
-                    example: Merieda
+                    type: number
+                    example: 2
                   mostwanted:
                     type: boolean
                     default: false
@@ -1160,8 +1162,8 @@ paths:
                             type: string
                             example: www.pic.com/galleta.jpg
                     category:
-                      type: string
-                      example: Merienda
+                      type: number
+                      example: 2
                     mostwanted:
                       type: boolean
                       default: false
@@ -1303,8 +1305,8 @@ paths:
                             type: string
                             example: wwww.pic.com/galletas.jpg
                     category:
-                      type: string
-                      example: Merienda
+                      type: number
+                      example: 2
                     mostwanted:
                       type: boolean
                       example: false
@@ -1388,8 +1390,8 @@ paths:
                             type: string
                             example: www.pic.com/img.jpg
                     category:
-                      type: string
-                      example: Rotiseria
+                      type: number
+                      example: 3
                     mostwanted:
                       type: boolean
                       example: true
@@ -1436,7 +1438,7 @@ paths:
                     type: string
                     example: Error del servidor
                     
-  /product/{id}/picture:
+  /products/{id}/pictures:
     get:
       tags: 
         - productos

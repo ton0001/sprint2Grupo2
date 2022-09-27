@@ -104,7 +104,6 @@ const updatePic = async (req, res) => {
     const modificado = await models.pictures.update(
       req.body,
       {where: {id: req.params.id}})
-      console.log(modificado)
       if (modificado[0]==1){
         res.status(200).json({
                 ok: true,
