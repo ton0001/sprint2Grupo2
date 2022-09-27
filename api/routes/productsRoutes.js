@@ -5,8 +5,8 @@ const verifyJWT = require('../middlewares/verifyJWT');
 const isAuthenticated = require('../middlewares/verifyRoles');
 
 // router.get('/', verifyJWT, productController.listCategory)
-router.get('/', productController.allProduct)
-router.get('/', verifyJWT, productController.rutaProducts)
+//router.get('/', productController.allProduct)
+router.get('/',/* verifyJWT,*/ productController.rutaProducts)
 router.get('/mostwanted', /*verifyJWT,*/  productController.mostWanted)
 router.get("/search", /*verifyJWT,*/ productController.searchProduct);
 router.get('/:id/pictures', /* verifyJWT,*/ productController.getPicByProductId)

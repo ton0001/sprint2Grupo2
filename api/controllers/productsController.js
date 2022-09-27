@@ -1,18 +1,13 @@
-
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
 const initModels = require("../../database/models/init-models");
 const { sequelize } = require("../../database/models");
-
 
 const models = initModels(sequelize);
 
 const productController = {
-
-    //   ----------------------   //
-
+  //   ----------------------   //
 
   allProduct: async function (req, res) {
-    
     try {
       const getAllProduct = await models.products.findAll({
         include: [
@@ -32,13 +27,9 @@ const productController = {
     }
   },
 
-
   //   ----------------------   //
 
-
   oneProduct: async function (req, res) {
-   
-
     try {
       const oneProduct = await models.products.findOne({
         where: {
@@ -68,10 +59,7 @@ const productController = {
 
   //   ----------------------   //
 
-
-  createProdut: async function (req, res) {  
-   
-
+  createProdut: async function (req, res) {
     try {
       models.products.create({
         title: req.body.title,
@@ -96,9 +84,7 @@ const productController = {
 
   //   ----------------------   //
 
-  productEdit: async function (req, res) { 
-    
-
+  productEdit: async function (req, res) {
     try {
       await models.products.update(
         {
@@ -128,16 +114,15 @@ const productController = {
 
   //   ----------------------   //
 
-  mostWanted: async function (req, res) {    
+  mostWanted: async function (req, res) {
     try {
-      const mostwanted =  await models.products.findAll({
+      const mostwanted = await models.products.findAll({
         where: {
-          mostwanted : true
-        }
+          mostwanted: true,
+        },
       });
 
-      res.status(200).json(mostwanted)
-
+      res.status(200).json(mostwanted);
     } catch (err) {
       console.log(err);
       res.status(400).json({
@@ -149,33 +134,36 @@ const productController = {
 
   //   ----------------------   //
 
-
   getPicByProductId: async (req, res) => {
     const paramsId = req.params.id;
 
     try {
-
-      const productImage = await models.products.findByPk( paramsId ,{
-        attributes: { exclude: ['price', 'description', 'category_id', 'mostwanted', 'stock']},
+      const productImage = await models.products.findByPk(paramsId, {
+        attributes: {
+          exclude: [
+            "price",
+            "description",
+            "category_id",
+            "mostwanted",
+            "stock",
+          ],
+        },
         include: [
           {
             model: models.pictures,
             as: "pictures",
             attributes: {
-              exclude: ['product_id']
-            }
-          }]
-      } 
-      )
+              exclude: ["product_id"],
+            },
+          },
+        ],
+      });
 
-        if(productImage.pictures.length === 0){
-       
-            res.json("Este producto no tiene imagenes asociadas")
-        } else {
-          res.json(productImage)
-        }
-      
-     
+      if (productImage.pictures.length === 0) {
+        res.json("Este producto no tiene imagenes asociadas");
+      } else {
+        res.json(productImage);
+      }
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -185,31 +173,37 @@ const productController = {
     }
   },
 
-   //   ----------------------   //
+  //   ----------------------   //
 
-  listCategory: (req, res) => {
+  listCategory: async (req, res) => {
+    let categoryParam = req.query.category;
     
-    let category = req.query.category;
 
     try {
-      let dbProduct = fs.readFileSync("api/data/products.json", "utf-8");
-      dbProduct = JSON.parse(dbProduct);
+      const product = await models.products.findAll({ 
+        include: [
+          {
+            model: models.category,
+            as: "category",
+            where: {
+              id: categoryParam
+            }
+          },
+        ],
 
-      let categoryFind = dbProduct.find(
-        (el) => el.category.toLowerCase() === category.toLowerCase()
-      );
 
-      if (categoryFind) {
-        let dbProductFilter = dbProduct.filter(
-          (el) => el.category.toLowerCase() === category.toLowerCase()
-        );
-        res.status(200).send(dbProductFilter);
+      })
+      if(product.length === 0){
+        res.status(400).json({
+          ok: false,
+          message: "No existe esa categoria"
+        })
       } else {
-        res.status(404).json({
-          msg: "Not Found",
-        });
+        res.status(200).json(product)
       }
-    } catch (err) {
+      
+      
+ } catch (err) {
       console.log(err);
       res.status(500).json({
         msg: "Error interno",
@@ -217,69 +211,80 @@ const productController = {
     }
   },
 
-  rutaProducts: (req, res) => {
+  rutaProducts: async (req, res) => {
     if (req.query.category) {
-      productController.listCategory(req, res);
+     await productController.listCategory(req, res);
     } else {
-      productController.allProduct(req, res);
+      
+    await  productController.allProduct(req, res);
     }
   },
 
-   //   ----------------------   //
+  //   ----------------------   //
 
   searchProduct: async (req, res) => {
     try {
-     const keyWord = req.query.q
-      const filteredProducto = await models.products.findAll({ where: {  [Op.or] : [ 
-        //title: {[Op.like]: `%${req.query.q}%`} 
-        {title: { 
-           $iLike : "%" + keyWord + "%"}
+      const keyWord = req.query.q;
+      const filteredProducto = await models.products.findAll({
+        where: {
+          [Op.or]: [
+            //title: {[Op.like]: `%${req.query.q}%`}
+            {
+              title: {
+                [Op.like]: "%" + keyWord + "%",
+              },
+            },
+            {
+              description: {
+                [Op.like]: "%" + keyWord + "%",
+              },
+            },
+          ],
+        },
 
-      }]}
-        
-        // title: { [Op.like]: "%" + keyWord + "%" } 
+        // title: { [Op.like]: "%" + keyWord + "%" }
         /*[Op.or]: [
           {title:       { [Op.like]: `%${search}%`}},
           {description: { [Op.like]: `%${search}%`}}
         ]
 }*/
-        // where: { [Op.or]: [{title: { 
+        // where: { [Op.or]: [{title: {
         //   [Op.substring]: "%" + keyWord + "%"}
         // }] }
         //  title: {[Op.substring]: `%${req.query.q}%`} ]}
-    })
-    
-    
-    if (filteredProducto.length === 0) {
-       res.status(404).send({ message: "No se encontraron productos" });
-       } else {
-        res.json(filteredProducto)
-       }
+      });
+
+      if (filteredProducto.length === 0) {
+        res.status(404).send({ message: "No se encontraron productos" });
+      } else {
+        res.json(filteredProducto);
+      }
     } catch (error) {
       res.status(500).send({ message: "Error al obtener los productos" });
     }
   },
 
-//   ----------------------   //
+  //   ----------------------   //
 
   deleteProduct: async (req, res) => {
     const { id } = req.params;
 
     try {
-       const searchingProductToDelete = await models.products.findByPk(id);
-       
-      if(searchingProductToDelete != undefined) {
+      const searchingProductToDelete = await models.products.findByPk(id);
+
+      if (searchingProductToDelete != undefined) {
         await searchingProductToDelete.destroy();
         res.status(200).json({
           ok: true,
-          message: "El producto se eliminó con exito"
-        })
+          message: "El producto se eliminó con exito",
+        });
       } else {
-        
-        res.status(400).json("El producto que desea eliminar no existe en nuestra base de datos")
+        res
+          .status(400)
+          .json(
+            "El producto que desea eliminar no existe en nuestra base de datos"
+          );
       }
-        
-      
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -292,11 +297,3 @@ const productController = {
 
 module.exports = productController;
 
-// const estanLosDatos = (campos)=>{
-//   let ret=true
-//   if(!campos.title || !campos.price || !campos.description ||  !campos.image || !campos.gallery || !campos.category || !campos.mostWanted || !campos.stock){
-//     ret = false
-//   }
-//   return ret
-
-// }
