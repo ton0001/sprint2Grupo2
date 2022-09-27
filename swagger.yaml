@@ -1994,7 +1994,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    product:
+                    product_id:
                       type: number
                       example: 77
                     quantity:
@@ -2010,7 +2010,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    product:
+                    product_id:
                       type: number
                       example: 77
                     quantity:

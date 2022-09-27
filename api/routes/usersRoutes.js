@@ -23,13 +23,17 @@ const handleErrors = require("../middlewares/handleErros");
 const { verifyUnique } = require('../../helpers/verifyUnique');
 
 router.get('/', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUEST']), getUsers);
-router.get("/:id", getUserById);
+
+router.get("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), getUserById);
+
+
 router.put("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']),
       check ('email').custom(verifyUnique.verifyEmail),
       check('email', 'formato de email no es valido').isEmail(),
       check ('username').custom(verifyUnique.verifyUsername),
       handleErrors, 
       updateUser);
+
 router.post('/', 
       check('username', 'el username es requerido').not().isEmpty(),
       check('email', 'el email es requerido').not().isEmpty(),
@@ -46,13 +50,10 @@ router.post('/',
 router.delete("/:id", verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), deleteUserById);
 
 router.get('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMIN', 'GUESTID']), cartsController.listCart);
-router.put('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
-router.get( '/:id/cart',
-      verifyJWT,
-      isAuthenticated(["GOD", "ADMIN", "GUESTID"]),
-      cartsController.listCart
-);
 
+router.put('/:id/cart', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
+
+router.get( '/:id/cart', verifyJWT, isAuthenticated(["GOD", "ADMIN", "GUESTID"]), cartsController.listCart);
 
 
 router.post('/login',

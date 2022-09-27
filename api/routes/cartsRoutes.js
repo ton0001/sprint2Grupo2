@@ -4,8 +4,8 @@ const cartsController = require('../controllers/cartsController');
 const verifyJWT = require('../middlewares/verifyJWT');
 const isAuthenticated = require('../middlewares/verifyRoles');
 
-router.get('/:id', cartsController.listCart);
+router.get('/:id', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.listCart);
 
-router.put('/:id', cartsController.updateCart);
+router.put('/:id', verifyJWT, isAuthenticated(['GOD', 'ADMINID', 'GUESTID']), cartsController.updateCart);
 
 module.exports = router;

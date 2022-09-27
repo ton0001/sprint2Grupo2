@@ -1,3 +1,4 @@
+
 const { generateJWT } = require('../../helpers/generateJWT');
 const initModels = require('../../database/models/init-models');
 const { sequelize } = require('../../database/models');
@@ -245,3 +246,4 @@ module.exports = {
   deleteUserById,
   login,
 };
+

@@ -1,3 +1,4 @@
+
 const initModels = require("../../database/models/init-models");
 const { sequelize } = require('../../database/models');
 
@@ -21,6 +22,7 @@ const isAuthenticated = (roles) => async (req, res, next) => {
             case "ADMIN":
                 if (roles.indexOf('ADMIN') !== -1) next()
                 else if (roles.indexOf("ADMINID") !== -1){
+
                     if (verifyUser(req)) next()
                     else{
                         return res.status(403).json({
@@ -77,7 +79,9 @@ const isAuthenticated = (roles) => async (req, res, next) => {
 
 
 const verifyUser = (req)=>{
-    if (Number(req.params.id) === Number(req.id)) return true
+    if (Number(req.params.id) === Number(req.tokenID)) {
+        return true
+    }
     else return false
 }
 
@@ -92,7 +96,8 @@ const getRole = async (req, res) => {
             result = {
                     status: 400,
                     ok : false,
-                    message: "Usuario ID no encontrado"
+                    message: "Usuario ID no encontrado",
+                    rol: req.role
                 }
           }
           
@@ -100,7 +105,8 @@ const getRole = async (req, res) => {
           result= {
                 status: 200,
                 ok : true,
-                message: "Role cargado correctamente a req"
+                message: "Role cargado correctamente a req",
+                rol: req.role
           }
     }catch (err) {
         console.log(err)

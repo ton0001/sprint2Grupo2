@@ -32,11 +32,13 @@ app.get('/api/v2',  (req, res)=>{ res.status(200).send("API funcionando correcta
 
 
 
+
 app.post('/api/v2/login',
     check('username', 'el username es requerido').not().isEmpty(),
     check('password', 'la contraseña es requerida').not().isEmpty(),
     handleErrors,
     login);
+
 
 
 app.use('/api/v2/products',productRoutes)

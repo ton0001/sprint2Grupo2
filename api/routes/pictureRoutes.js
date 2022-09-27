@@ -17,7 +17,9 @@ const isAuthenticated = require('../middlewares/verifyRoles');
 
 
 router.get('/', verifyJWT, getPictureByProductId)
+
 router.get('/:id', verifyJWT, getPictureById);
+
 router.post('/', verifyJWT, isAuthenticated(['GOD']), 
         check('url', 'se necesita una url').not().isEmpty(), 
         check('description', 'se necesita una descripcion').not().isEmpty(), 
@@ -31,6 +33,7 @@ router.put('/:id', verifyJWT, isAuthenticated(['GOD']),
         check('product_id', 'se necesita una product_id').not().isEmpty(), 
         handleErrors, 
         updatePic);
+        
 router.delete('/:id', verifyJWT, isAuthenticated(['GOD']), deletePicture)
 
 module.exports = router;
