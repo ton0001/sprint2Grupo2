@@ -1,38 +1,64 @@
-const express = require('express')
-const {json} = express
-const fs = require("fs");
-const path = require("path");
+
+const { Op } = require('sequelize');
+const initModels = require("../../database/models/init-models");
+const { sequelize } = require("../../database/models");
+
+
+const models = initModels(sequelize);
 
 const productController = {
-  allProduct: function (req, res) {
-    const readAllProduct = fs.readFileSync("api/data/products.json", "utf-8");
-    const readAllProductParsered = JSON.parse(readAllProduct);
 
+    //   ----------------------   //
+
+
+  allProduct: async function (req, res) {
+    
     try {
-      res.status(200).json(readAllProductParsered);
+      const getAllProduct = await models.products.findAll({
+        include: [
+          {
+            model: models.category,
+            as: "category",
+          },
+        ],
+      });
+
+      res.status(200).json(getAllProduct);
     } catch (error) {
       res.status(500).json({
-        message: 'Error del servidor al cargar los productos'
+        message: "Error del servidor al cargar los productos",
       });
       console.log("Catch error" + error);
     }
   },
 
-  oneProduct: function (req, res) {
-    const readAllProduct = fs.readFileSync("api/data/products.json", "utf-8");
-    const readAllProductParsered = JSON.parse(readAllProduct);
+
+  //   ----------------------   //
+
+
+  oneProduct: async function (req, res) {
+   
 
     try {
-      const filteredProduct = readAllProductParsered.filter((product) => {
-        return product.id === Number(req.params.id);
+      const oneProduct = await models.products.findOne({
+        where: {
+          id: req.params.id,
+        },
+        include: [
+          {
+            model: models.category,
+            as: "category",
+          },
+        ],
       });
-      if (filteredProduct.length===0) {
+
+      if (!oneProduct) {
         res.status(404).json({
           ok: false,
           msg: "El producto no existe",
         });
       } else {
-        res.status(200).json(filteredProduct);
+        res.status(200).json(oneProduct);
       }
     } catch (error) {
       res.send(error);
@@ -40,222 +66,237 @@ const productController = {
     }
   },
 
-  createProdut: function (req, res) {
+  //   ----------------------   //
 
-  if(!estanLosDatos(req.body)){
-      res.status(400).json({ message: "Faltan datos para crear el producto"})
-  }
-  else{
 
-    try{
-      const readProducts = fs.readFileSync("api/data/products.json", "utf-8");
-      const productParsered = JSON.parse(readProducts);
-  
-  
-      const newProduct = {
-        id: productParsered.at(-1).id + 1,
+  createProdut: async function (req, res) {  
+   
+
+    try {
+      models.products.create({
         title: req.body.title,
         price: req.body.price,
         description: req.body.description,
-        image: req.body.image,
-        gallery: req.body.gallery,
-        category: req.body.category,
-        mostWanted: req.body.mostWanted,
-        stock: req.body.stock
-      };
+        category_id: req.body.category,
+        mostwanted: req.body.mostwanted,
+        stock: req.body.stock,
+      });
 
-       productParsered.push(newProduct);
-
-        fs.writeFileSync("api/data/products.json", JSON.stringify(productParsered));
-        res.status(200).json({
-          ok: true,
-          message: "producto agregado"
-        });
-    }catch(error){
+      res.status(200).json({
+        ok: false,
+        message: "Producto Agregado",
+      });
+    } catch (error) {
       res.status(500).json({
         ok: false,
-        message: "Error del servidor al crear el producto"
+        message: "Error del servidor al crear el producto",
       });
     }
-  }
   },
 
-  productEdit: function (req, res) {
-    const { id, ...restoDeElementos } = req.body;
-    const idProduct = req.params.id;
+  //   ----------------------   //
+
+  productEdit: async function (req, res) { 
+    
 
     try {
-      const dataToParse = fs.readFileSync("api/data/products.json", "utf-8");
-      const data = JSON.parse(dataToParse);
-
-      const dataUpdate = data.map((product) => {
-        if (product.id === Number(idProduct)) {
-          const newEl = { ...product, ...restoDeElementos };
-          return newEl;
-        } else {
-          //console.log(product);
-          return product;
+      await models.products.update(
+        {
+          title: req.body.title,
+          price: req.body.price,
+          description: req.body.description,
+          category_id: req.body.category,
+          mostwanted: req.body.mostwanted,
+          stock: req.body.stock,
+        },
+        {
+          where: {
+            id: req.params.id,
+          },
         }
+      );
+
+      res.status(200).json({
+        ok: true,
+        message: "producto modificado",
       });
-      fs.writeFileSync("api/data/products.json", JSON.stringify(dataUpdate));
-      res.send(dataUpdate);
     } catch (error) {
       console.log(error);
       res.send("Error inesperado");
     }
   },
 
-  mostWanted: function (req, res) {
-    
-    const readProducts = fs.readFileSync("api/data/products.json", "utf-8");
-    const productParsered = JSON.parse(readProducts);
+  //   ----------------------   //
 
+  mostWanted: async function (req, res) {    
     try {
-      
-        const filteredProduct = productParsered.filter((product) => {
-        return product.mostWanted === true;
-      });
-      
-      res.status(200).json(filteredProduct)
-      
-      
-    } catch (err) {
-      
-      console.log(err);
-    }
-  },
-
-  getPicByProductId : (req, res) =>{
-    try {
-        const ruta=path.join(__dirname, '..', 'data', 'products.json')
-        let products = fs.readFileSync(ruta, 'utf-8');        
-        products = JSON.parse(products);
-        
-        let resp = products.find(elem => elem.id === parseInt(req.params.id));
-        if(!resp){
-            res.status(404).json({
-                ok: false,
-                msg: 'no existen coincidencias'
-            });
-        }else{
-          resp = resp.gallery;
-            res.status(200).json({
-                ok: true,
-                resp
-            });
+      const mostwanted =  await models.products.findAll({
+        where: {
+          mostwanted : true
         }
+      });
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok:false,
-            msg:'server error'
-        });
+      res.status(200).json(mostwanted)
+
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({
+        ok: false,
+        message: "Error inesperado",
+      });
     }
   },
+
+  //   ----------------------   //
+
+
+  getPicByProductId: async (req, res) => {
+    const paramsId = req.params.id;
+
+    try {
+
+      const productImage = await models.products.findByPk( paramsId ,{
+        attributes: { exclude: ['price', 'description', 'category_id', 'mostwanted', 'stock']},
+        include: [
+          {
+            model: models.pictures,
+            as: "pictures",
+            attributes: {
+              exclude: ['product_id']
+            }
+          }]
+      } 
+      )
+
+        if(productImage.pictures.length === 0){
+       
+            res.json("Este producto no tiene imagenes asociadas")
+        } else {
+          res.json(productImage)
+        }
+      
+     
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        ok: false,
+        msg: "server error",
+      });
+    }
+  },
+
+   //   ----------------------   //
 
   listCategory: (req, res) => {
+    
     let category = req.query.category;
 
-    try{
-      let dbProduct = fs.readFileSync(
-        "api/data/products.json",
-        "utf-8"
-      );
+    try {
+      let dbProduct = fs.readFileSync("api/data/products.json", "utf-8");
       dbProduct = JSON.parse(dbProduct);
 
-      let categoryFind = dbProduct.find(el => el.category.toLowerCase() === category.toLowerCase())
-      
-      if(categoryFind){
-        let dbProductFilter = dbProduct.filter(el => el.category.toLowerCase() === category.toLowerCase());
+      let categoryFind = dbProduct.find(
+        (el) => el.category.toLowerCase() === category.toLowerCase()
+      );
+
+      if (categoryFind) {
+        let dbProductFilter = dbProduct.filter(
+          (el) => el.category.toLowerCase() === category.toLowerCase()
+        );
         res.status(200).send(dbProductFilter);
       } else {
         res.status(404).json({
-          msg: 'Not Found'
-        })
+          msg: "Not Found",
+        });
       }
-    } catch(err){
-      console.log(err)
+    } catch (err) {
+      console.log(err);
       res.status(500).json({
-        msg: 'Error interno'
-     });
-    }
-  },
-
-  rutaProducts: (req, res)=> {
-    if (req.query.category){
-      productController.listCategory(req, res)
-    }
-    else {
-      productController.allProduct(req, res)
-    }
-  },
-
-  searchProduct: (req, res) => {
-    try {
-      let products = fs.readFileSync(
-        path.join(__dirname, "../data/products.json"),
-        "utf-8"
-      );
-      products = JSON.parse(products);
-      const keyword = req.query.q;
-
-      const productsFound = products.filter((product) => {
-        return ( product.title.toLowerCase().includes(keyword.toLowerCase()) || 
-        product.description.toLowerCase().includes(keyword.toLowerCase()) || 
-        product.category.toLowerCase().includes(keyword.toLowerCase()) )
+        msg: "Error interno",
       });
-      if (productsFound.length > 0) {
-        res.send(productsFound);
-      } else {
-        res.status(404).send({ message: "No se encontraron productos" });
-      }
+    }
+  },
+
+  rutaProducts: (req, res) => {
+    if (req.query.category) {
+      productController.listCategory(req, res);
+    } else {
+      productController.allProduct(req, res);
+    }
+  },
+
+   //   ----------------------   //
+
+  searchProduct: async (req, res) => {
+    try {
+     const keyWord = req.query.q
+      const filteredProducto = await models.products.findAll({ where: {  [Op.or] : [ 
+        //title: {[Op.like]: `%${req.query.q}%`} 
+        {title: { 
+           $iLike : "%" + keyWord + "%"}
+
+      }]}
+        
+        // title: { [Op.like]: "%" + keyWord + "%" } 
+        /*[Op.or]: [
+          {title:       { [Op.like]: `%${search}%`}},
+          {description: { [Op.like]: `%${search}%`}}
+        ]
+}*/
+        // where: { [Op.or]: [{title: { 
+        //   [Op.substring]: "%" + keyWord + "%"}
+        // }] }
+        //  title: {[Op.substring]: `%${req.query.q}%`} ]}
+    })
+    
+    
+    if (filteredProducto.length === 0) {
+       res.status(404).send({ message: "No se encontraron productos" });
+       } else {
+        res.json(filteredProducto)
+       }
     } catch (error) {
       res.status(500).send({ message: "Error al obtener los productos" });
     }
   },
 
-  deleteProduct: (req, res) => {
+//   ----------------------   //
+
+  deleteProduct: async (req, res) => {
     const { id } = req.params;
- 
+
     try {
-       const dataToParse = fs.readFileSync('./api/data/products.json', 'utf-8');
-       const data = JSON.parse(dataToParse);
-
-       const productdelete=data.find(el => el.id === Number(id))
-
-       if(productdelete){
-        const newData = data.filter(el => el.id !== Number(id));
-        fs.writeFileSync('./api/data/products.json', JSON.stringify(newData));
+       const searchingProductToDelete = await models.products.findByPk(id);
+       
+      if(searchingProductToDelete != undefined) {
+        await searchingProductToDelete.destroy();
         res.status(200).json({
-              ok: true,
-              msg: "producto eliminado con exito",
-             });
-       }
-       else{
-          res.status(404).json({
-          ok: false,
-          msg: "Product not found",
+          ok: true,
+          message: "El producto se eliminó con exito"
+        })
+      } else {
+        
+        res.status(400).json("El producto que desea eliminar no existe en nuestra base de datos")
+      }
+        
+      
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        ok: false,
+        msg: "Error del servidor al eliminar el producto",
       });
-       }
-    }catch (error) {
-       console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: "Error del servidor al eliminar el producto",
-       });
     }
- }
-
+  },
 };
 
 module.exports = productController;
 
-const estanLosDatos = (campos)=>{
-  let ret=true
-  if(!campos.title || !campos.price || !campos.description ||  !campos.image || !campos.gallery || !campos.category || !campos.mostWanted || !campos.stock){
-    ret = false
-  }
-  return ret
+// const estanLosDatos = (campos)=>{
+//   let ret=true
+//   if(!campos.title || !campos.price || !campos.description ||  !campos.image || !campos.gallery || !campos.category || !campos.mostWanted || !campos.stock){
+//     ret = false
+//   }
+//   return ret
 
-}
+// }
