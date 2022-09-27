@@ -69,37 +69,32 @@ const controllerCart = {
       let stockQuantity = {};
       let plusQuantity = 0;
       if(cartDB.length > 0){
-        cartDB.forEach(async (product) =>{
+        for (let product of cartDB){
           stockQuantity = await models.products.findByPk(product.dataValues.product_id)
           plusQuantity = product.dataValues.quantity + stockQuantity.dataValues.stock;
-          // console.log(plusQuantity)
           await models.products.update({stock: plusQuantity},
             {
               where: {
                 id: product.dataValues.product_id
               }
             });
-          // console.log((await models.products.findByPk(product.dataValues.product_id, {
-          //   attributes: ['id', 'stock']
-          // })).dataValues)
-        })  
+        }
       }
 
       //Evaluo si hay stock para crear el proximo carrito
-      req.body.forEach(async (product) => {
-        
+      for (let product of req.body){
         productDB = await models.products.findByPk(product.product_id);
+
         if(productDB.dataValues.stock < product.quantity) {
+          console.log('entro')
           noStock = true;
         }
-      })
+      }
 
-      //¿Espero un tiempo para que cargue la base de datos?
-      setTimeout(async ()=>{
         //Envio respustas segun corresponda
         if(noStock){
           //Quito el stock del carrito anterior a la db
-          cartDB.forEach(async (product) =>{
+          for (let product of cartDB){
             stockQuantity = await models.products.findByPk(product.dataValues.product_id)
             await models.products.update({stock: stockQuantity.dataValues.stock - product.dataValues.quantity },
               {
@@ -107,7 +102,7 @@ const controllerCart = {
                   id: product.dataValues.product_id
                 }
               });
-          })  
+          }  
           
           res.status(400).json({
             ok: false,
@@ -121,48 +116,41 @@ const controllerCart = {
             }
           })
   
-          //Creo el carrido nuevo con los datos del body       
-          req.body.forEach(async (product) => {
+          //Creo el carrido nuevo con los datos del body  
+          for (let product of req.body){
             await models.product_cart.create({
               cart_id: cart_ID,
               product_id: product.product_id,
               quantity: product.quantity
             })
-          })
+          }
   
           //Actualizo el stock del carrito quitando los datos nuevos
           let stockQuantityNew = {};
           let plusQuantityNew = 0;
-          req.body.forEach(async (product) =>{
+          for (let product of req.body){
             stockQuantityNew = await models.products.findByPk(product.product_id);
             plusQuantityNew = stockQuantityNew.dataValues.stock - product.quantity;
-            // console.log(plusQuantityNew);
             await models.products.update({stock: plusQuantityNew},
               {
                 where: {
                   id: product.product_id
                 }
               });
-            // console.log((await models.products.findByPk(product.product_id, {
-            //   attributes: ['id', 'stock']
-            // })).dataValues)
-          })  
+          }  
           
           //Obtengo los productos del cart actualizado
           let cartDBupdate = {}
-          setTimeout(async ()=>{
-            cartDBupdate = await models.product_cart.findAll(
-              {
-                where: {cart_id: cart_ID},
-                attributes: ['product_id', 'quantity', 'created_at', 'updated_at']
-              }
-            ) 
-            res.status(200).json(cartDBupdate)
-          }, 30)
+          cartDBupdate = await models.product_cart.findAll(
+            {
+              where: {cart_id: cart_ID},
+              attributes: ['product_id', 'quantity', 'created_at', 'updated_at']
+            }
+          ) 
+          res.status(200).json(cartDBupdate)
         }
-      }, 75)
     } catch (err){
-      // console.log(err)
+      console.log(err)
       res.status(500).json({
         ok:false,
         message: 'Error interno del servidor'
