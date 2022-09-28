@@ -15,7 +15,7 @@ const getUsers = async (req, res) => {
         {
           model: models.carts,
           as: 'carts',
-          attributes: { exclude: ['user_id'] },
+          attributes: { exclude: ['user_id', 'password']  },
           include: [
             {
               model: models.product_cart,
@@ -30,8 +30,10 @@ const getUsers = async (req, res) => {
           ],
         },
       ],
+      attributes: { exclude: ['password'] },
     });
-    res.satuts(200).json(users);
+
+    res.status(200).json(users);
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -53,6 +55,7 @@ const getUserById = async (req, res) => {
   try {
     const user = await models.users.findOne({
       where: { id: req.params.id },
+      attributes: { exclude: ['password'] },
       include: [
         {
           model: models.carts,
@@ -94,7 +97,11 @@ const createUser = async (req, res) => {
   let user
   try{
       user =  await models.users.create(req.body)
-      userCreated = await models.users.findOne({where: {username: req.body.username}})
+      userCreated = await models.users.findOne({
+        where: {username: req.body.username},
+        attributes: {exclude: ['user_id', 'password'] 
+      }
+      })
 
   }catch(error){
     return res.status(500).json({ 
@@ -130,12 +137,17 @@ const updateUser = async (req, res) => {
   try {
     const user = await models.users.findOne({
       where: { id: req.params.id },
+      attributes: {exclude: ['user_id']}
+        
     });
 
     const updatedUser = await models.users.update(req.body, {
       where: { id: req.params.id },
     });
-    const userUpdated = await models.users.findByPk(req.params.id)
+    const userUpdated = await models.users.findByPk(req.params.id, {
+      attributes: { exclude: ['password']}
+    })
+
 
     if (updatedUser) {
       res.status(200).json(

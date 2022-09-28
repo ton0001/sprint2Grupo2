@@ -264,7 +264,7 @@ const productController = {
     if (filteredProducto.length === 0) {
        res.status(404).json({ ok: false, message: "No se encontraron productos" });
        } else {
-        res.staus(200).json(filteredProducto)
+        res.status(200).json(filteredProducto)
        }
     } catch (error) {
       console.log(error)

@@ -104,7 +104,7 @@ paths:
                     example: Error de servidor
                     
 
-  /user/login:
+  /users/login:
    post:
       tags: 
         - usuarios
